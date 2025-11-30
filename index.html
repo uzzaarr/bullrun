@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bullrun Leaderboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="loader-screen" id="loaderScreen">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
+                <div class="loader-glow"></div>
+            </div>
+            <div class="loader-bar">
+                <div class="loader-progress" id="loaderProgress"></div>
+            </div>
+            <p class="loader-text">Loading Leaderboard...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo-wrapper">
+                <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
+                <div class="logo-glow"></div>
+            </div>
+            <h1>Bullrun Leaderboard</h1>
+            <p class="subtitle">Top performers in the race to the moon</p>
+        </header>
+
+        <div class="search-wrapper">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" id="searchInput" placeholder="Search username..." onkeyup="searchUser()" autocomplete="off" />
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">Total Participants</span>
+                <span class="stat-value" id="totalCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Displaying</span>
+                <span class="stat-value" id="displayCount">0</span>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Username</th>
+                        <th>Rewards</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody"></tbody>
+            </table>
+            <div class="loading-indicator" id="loadingIndicator">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <a href="https://infinex.xyz" target="_blank" rel="noopener">infinex.xyz</a>
+        <span class="separator">•</span>
+        <a href="https://x.com/infinex" target="_blank" rel="noopener">@infinex</a>
+        <span class="separator">•</span>
+        <a href="https://x.com/0xAirr" target="_blank" rel="noopener">@0xAirr</a>
+    </footer>
+
+    <script src="data.js"></script>
+
+    <script>
+        const tbody = document.getElementById("leaderboardBody");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+        const totalCountEl = document.getElementById("totalCount");
+        const displayCountEl = document.getElementById("displayCount");
+
+        let currentData = [];
+        let displayedRows = 0;
+        const BATCH_SIZE = 50;
+        let isLoading = false;
+
+        function updateStats(total, displayed) {
+            totalCountEl.textContent = total.toLocaleString();
+            displayCountEl.textContent = displayed.toLocaleString();
+        }
+
+        function createRow(item) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="rank-badge">#${item.rank}</span></td>
+                <td><span class="username">${escapeHtml(item.username)}</span></td>
+                <td><span class="rewards">${item.patron} Patron + ${item.crates} Crates</span></td>
+            `;
+            return tr;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function loadMoreRows() {
+            if (isLoading || displayedRows >= currentData.length) return;
+            
+            isLoading = true;
+            loadingIndicator.style.display = 'flex';
+
+            setTimeout(() => {
+                const fragment = document.createDocumentFragment();
+                const end = Math.min(displayedRows + BATCH_SIZE, currentData.length);
+                
+                for (let i = displayedRows; i < end; i++) {
+                    fragment.appendChild(createRow(currentData[i]));
+                }
+                
+                tbody.appendChild(fragment);
+                displayedRows = end;
+                updateStats(currentData.length, displayedRows);
+                
+                isLoading = false;
+                loadingIndicator.style.display = displayedRows >= currentData.length ? 'none' : 'flex';
+            }, 100);
+        }
+
+        function loadTable(data) {
+            tbody.innerHTML = "";
+            currentData = data;
+            displayedRows = 0;
+            loadMoreRows();
+        }
+
+        const tableContainer = document.querySelector('.table-container');
+        tableContainer.addEventListener('scroll', () => {
+            if (tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 200) {
+                loadMoreRows();
+            }
+        });
+
+        const loaderScreen = document.getElementById('loaderScreen');
+        const loaderProgress = document.getElementById('loaderProgress');
+        let progress = 0;
+
+        function updateLoader() {
+            progress += Math.random() * 15 + 5;
+            if (progress > 100) progress = 100;
+            loaderProgress.style.width = progress + '%';
+            
+            if (progress < 100) {
+                setTimeout(updateLoader, 150);
+            } else {
+                setTimeout(() => {
+                    loaderScreen.classList.add('fade-out');
+                    setTimeout(() => {
+                        loaderScreen.style.display = 'none';
+                    }, 500);
+                }, 300);
+            }
+        }
+
+        if (typeof LEADERBOARD !== 'undefined') {
+            updateLoader();
+            loadTable(LEADERBOARD);
+        }
+
+        function searchUser() {
+            if (typeof LEADERBOARD === 'undefined') return;
+            
+            let value = document.getElementById("searchInput").value.toLowerCase();
+            let filtered = LEADERBOARD.filter(item =>
+                item.username.toLowerCase().includes(value)
+            );
+            loadTable(filtered);
+        }
+    </script>
+
+</body>
+</html>
