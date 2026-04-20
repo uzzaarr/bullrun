@@ -1,0 +1,445 @@
+/* sonar.css — Sonar Sale & Patron Vesting Analytics Page */
+/* Inherits all CSS variables and base styles from style.css */
+
+/* ── Container ────────────────────────────────────────── */
+.sonar-container {
+    max-width: 1200px;
+    padding-top: 40px;
+}
+
+/* ── Header ───────────────────────────────────────────── */
+.sonar-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 72px;
+}
+
+.last-updated {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 18px;
+    border-radius: 100px;
+    border: 1px solid rgba(247, 107, 28, 0.3);
+    background: rgba(247, 107, 28, 0.07);
+    font-size: 12px;
+    font-family: var(--font-mono);
+    color: var(--accent-color);
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+.last-updated-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    box-shadow: 0 0 8px var(--accent-color);
+    animation: dotPulse 2.4s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes dotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* ── Section Layout ───────────────────────────────────── */
+.section {
+    margin-bottom: 72px;
+}
+
+.section-header {
+    margin-bottom: 28px;
+}
+
+.section-eyebrow {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    font-family: var(--font-mono);
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+}
+
+/* ── Bento KPI Grid ───────────────────────────────────── */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+/* ── KPI Cards ────────────────────────────────────────── */
+.kpi-card {
+    background: rgba(9, 9, 9, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 18px;
+    padding: 26px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease;
+    cursor: default;
+    opacity: 0;
+    animation: cardFadeUp 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Staggered entrance */
+.kpi-card:nth-child(1) { animation-delay: 0.08s; }
+.kpi-card:nth-child(2) { animation-delay: 0.14s; }
+.kpi-card:nth-child(3) { animation-delay: 0.20s; }
+.kpi-card:nth-child(4) { animation-delay: 0.26s; }
+.kpi-card:nth-child(5) { animation-delay: 0.32s; }
+.kpi-card:nth-child(6) { animation-delay: 0.38s; }
+
+@keyframes cardFadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Top edge glow on hover */
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(247, 107, 28, 0.55) 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Corner radial accent */
+.kpi-card::after {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(247, 107, 28, 0.05) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+.kpi-card:hover {
+    border-color: rgba(247, 107, 28, 0.18);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(247, 107, 28, 0.08);
+    transform: translateY(-2px);
+}
+
+.kpi-card:hover::before {
+    opacity: 1;
+}
+
+/* Span modifiers */
+.kpi-card.span-2 { grid-column: span 2; }
+
+.kpi-card.span-3 {
+    grid-column: span 3;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 0;
+}
+
+.kpi-inner {
+    padding: 26px 28px;
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.kpi-inner:last-child {
+    border-right: none;
+}
+
+/* Card typography */
+.kpi-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    margin-bottom: 14px;
+    display: block;
+}
+
+.kpi-value {
+    font-size: 40px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    line-height: 1;
+    letter-spacing: -1.5px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.kpi-value.is-accent {
+    color: var(--accent-color);
+}
+
+.kpi-value.is-lg {
+    font-size: 32px;
+}
+
+.kpi-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    display: block;
+    line-height: 1.4;
+}
+
+.kpi-sub .hl {
+    color: var(--accent-color);
+    font-family: var(--font-mono);
+    font-weight: 700;
+}
+
+.kpi-sub .dim {
+    color: var(--text-tertiary);
+}
+
+/* ── Distribution Card ────────────────────────────────── */
+.distribution-card {
+    background: rgba(9, 9, 9, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 18px;
+    padding: 34px 36px;
+    opacity: 0;
+    animation: cardFadeUp 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+}
+
+.dist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 18px;
+}
+
+.dist-total-label {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    font-weight: 700;
+}
+
+.dist-total-value {
+    font-size: 13px;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+}
+
+/* Bar */
+.dist-bar {
+    display: flex;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+    gap: 2px;
+    margin-bottom: 28px;
+}
+
+.dist-segment {
+    height: 100%;
+    border-radius: 5px;
+    flex-shrink: 0;
+    transition: width 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0;
+}
+
+.dist-segment.seg-claimed {
+    background: linear-gradient(90deg, #F76B1C, #ff8533);
+    box-shadow: 0 0 14px rgba(247, 107, 28, 0.45);
+}
+
+.dist-segment.seg-unclaimed {
+    background: linear-gradient(90deg, #ff9a4d, #ffb07a);
+    box-shadow: 0 0 10px rgba(255, 154, 77, 0.25);
+}
+
+.dist-segment.seg-locked {
+    flex: 1;           /* fills remaining space — no animation needed */
+    background: #1c1c1c;
+    transition: none;
+    width: auto;
+}
+
+/* Legend */
+.dist-legend {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.dist-legend-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dist-legend-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    font-weight: 700;
+}
+
+.dist-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.dist-legend-value {
+    font-size: 24px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+    line-height: 1;
+}
+
+.dist-legend-pct {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+}
+
+/* ── Table Sections ───────────────────────────────────── */
+.table-section-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.table-count-badge {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-tertiary);
+    letter-spacing: 0.5px;
+    padding: 4px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background: rgba(255,255,255,0.02);
+}
+
+/* Allow horizontal scroll on narrow viewports */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    min-width: 640px;
+}
+
+/* Cell value styles */
+.wallet-addr {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-secondary);
+    letter-spacing: 0.2px;
+}
+
+.val-usdc {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.val-inx {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.val-fee {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: #f87171;
+    font-weight: 500;
+}
+
+.val-neutral {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.val-nft {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 8px;
+    background: rgba(247, 107, 28, 0.1);
+    border: 1px solid rgba(247, 107, 28, 0.22);
+    border-radius: 7px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 960px) {
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .kpi-card.span-2  { grid-column: span 1; }
+    .kpi-card.span-3  {
+        grid-column: span 2;
+        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
+    }
+    .kpi-card.span-3 .kpi-inner {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .kpi-card.span-3 .kpi-inner:last-child {
+        border-bottom: none;
+    }
+    .dist-legend {
+        grid-template-columns: 1fr 1fr;
+    }
+    .section-title { font-size: 26px; }
+}
+
+@media (max-width: 620px) {
+    .sonar-container { padding-top: 24px; }
+    .bento-grid      { grid-template-columns: 1fr; gap: 10px; }
+    .kpi-card.span-2,
+    .kpi-card.span-3 { grid-column: span 1; }
+    .kpi-card.span-3 { display: block; }
+    .kpi-value       { font-size: 32px; }
+    .kpi-value.is-lg { font-size: 26px; }
+    .distribution-card { padding: 24px 20px; }
+    .dist-legend     { grid-template-columns: 1fr; }
+    .dist-legend-value { font-size: 20px; }
+    .section-title   { font-size: 22px; }
+    .sonar-header h1 { font-size: 36px; }
+    .table-section-meta { flex-direction: column; align-items: flex-start; }
+}

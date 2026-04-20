@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -24,6 +24,12 @@
             <p class="loader-text">Loading Leaderboard...</p>
         </div>
     </div>
+
+    <!-- Page Nav -->
+    <nav class="page-nav">
+        <a href="index.html" class="nav-link active">Leaderboard</a>
+        <a href="sonar.html" class="nav-link">Sonar Analytics</a>
+    </nav>
 
     <div class="container">
         <header>
@@ -142,6 +148,7 @@
             tbody.innerHTML = "";
             currentData = data;
             displayedRows = 0;
+            isLoading = false;
             loadMoreRows();
         }
 

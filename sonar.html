@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sonar/Patron Analytics — Infinex</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sonar.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Loader -->
+    <div class="loader-screen" id="loaderScreen">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
+                <div class="loader-glow"></div>
+            </div>
+            <div class="loader-bar">
+                <div class="loader-progress" id="loaderProgress"></div>
+            </div>
+            <p class="loader-text">Loading Analytics...</p>
+        </div>
+    </div>
+
+    <!-- Page Nav -->
+    <nav class="page-nav">
+        <a href="index.html" class="nav-link">Leaderboard</a>
+        <a href="sonar.html" class="nav-link active">Sonar Analytics</a>
+    </nav>
+
+    <div class="container sonar-container">
+
+        <!-- Header -->
+        <header class="sonar-header">
+            <div class="logo-wrapper">
+                <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
+                <div class="logo-glow"></div>
+            </div>
+            <h1>Sonar/Patron Analytics</h1>
+            <p class="subtitle">INX Token Sale &amp; Patron Vesting — On-chain data</p>
+            <div class="last-updated" id="lastUpdatedBadge">
+                <span class="last-updated-dot"></span>
+                <span id="lastUpdatedText">Loading...</span>
+            </div>
+        </header>
+
+        <!-- ── KPI Cards ──────────────────────────────────── -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-eyebrow">Sale Overview</span>
+                <h2 class="section-title">Key Metrics</h2>
+            </div>
+            <div class="bento-grid" id="kpiGrid">
+                <!-- Card 1: Participants (1 col) -->
+                <div class="kpi-card">
+                    <span class="kpi-label">Total Participants</span>
+                    <span class="kpi-value" id="kpi-participants">—</span>
+                    <span class="kpi-sub">Base Chain Depositors</span>
+                </div>
+                <!-- Card 2: INX Allocated (2 col) -->
+                <div class="kpi-card span-2">
+                    <span class="kpi-label">INX Allocated</span>
+                    <span class="kpi-value is-accent" id="kpi-allocated">—</span>
+                    <span class="kpi-sub">Hard cap — fully subscribed</span>
+                </div>
+                <!-- Card 3: INX Vested (1 col) -->
+                <div class="kpi-card">
+                    <span class="kpi-label">INX Vested</span>
+                    <span class="kpi-value" id="kpi-vested">—</span>
+                    <span class="kpi-sub"><span class="hl" id="kpi-vested-pct">—</span> of total &nbsp;·&nbsp; <span class="dim">76 days</span></span>
+                </div>
+                <!-- Card 4: INX Claimed (1 col) -->
+                <div class="kpi-card">
+                    <span class="kpi-label">INX Claimed</span>
+                    <span class="kpi-value" id="kpi-claimed">—</span>
+                    <span class="kpi-sub"><span class="hl" id="kpi-claimed-pct">—</span> of total allocation</span>
+                </div>
+                <!-- Card 5: ETH Claimants (1 col) -->
+                <div class="kpi-card">
+                    <span class="kpi-label">ETH Claimants</span>
+                    <span class="kpi-value" id="kpi-claimants">—</span>
+                    <span class="kpi-sub">Ethereum chain claimants</span>
+                </div>
+                <!-- Card 6: Early Unlock Fees (3 col full-width, 3 inner sections) -->
+                <div class="kpi-card span-3">
+                    <div class="kpi-inner">
+                        <span class="kpi-label">Early Unlock Fees</span>
+                        <span class="kpi-value is-lg" id="kpi-fees">—</span>
+                        <span class="kpi-sub">Total USDC paid to unlock</span>
+                    </div>
+                    <div class="kpi-inner">
+                        <span class="kpi-label">Avg Fee per Claimant</span>
+                        <span class="kpi-value is-lg" id="kpi-avg-fee">—</span>
+                        <span class="kpi-sub">Across <span class="hl" id="kpi-claimants-2">—</span> claimants</span>
+                    </div>
+                    <div class="kpi-inner">
+                        <span class="kpi-label">Vesting Schedule</span>
+                        <span class="kpi-value is-lg" style="font-size:22px; letter-spacing:-0.5px; margin-top:4px;">365 days</span>
+                        <span class="kpi-sub">Jan 30 2026 <span class="dim">→</span> Jan 30 2027</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── INX Distribution ───────────────────────────── -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-eyebrow">Sonar Allocation</span>
+                <h2 class="section-title">Sonar Allocation Breakdown</h2>
+            </div>
+            <div class="distribution-card">
+                <div class="dist-header">
+                    <span class="dist-total-label">Total Supply</span>
+                    <span class="dist-total-value">500,000,000 INX</span>
+                </div>
+                <div class="dist-bar" id="distBar">
+                    <div class="dist-segment seg-claimed"   id="seg0"></div>
+                    <div class="dist-segment seg-unclaimed" id="seg1"></div>
+                    <div class="dist-segment seg-locked"    id="seg2"></div>
+                </div>
+                <div class="dist-legend" id="distLegend">
+                    <!-- populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Sonar Sale Wallet Table ────────────────────── -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-eyebrow">Sonar Sale</span>
+                <h2 class="section-title">Wallet Breakdown</h2>
+            </div>
+            <div class="table-section-meta">
+                <div class="search-wrapper sonar-search" style="flex:1; margin-bottom:0;">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" id="walletSearch" placeholder="Search wallet address..." onkeyup="searchWallets()" autocomplete="off" />
+                </div>
+                <span class="table-count-badge" id="walletCountBadge">— wallets</span>
+            </div>
+            <div class="table-container" id="walletTableContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Wallet</th>
+                            <th>USDC Deposited</th>
+                            <th>INX Allocated</th>
+                            <th>INX Claimed</th>
+                            <th>Unlock Fee</th>
+                            <th>INX Vested</th>
+                        </tr>
+                    </thead>
+                    <tbody id="walletTableBody"></tbody>
+                </table>
+                <div class="loading-indicator" id="walletLoadingIndicator">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Patron NFT Vesting Table ───────────────────── -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-eyebrow">Patron Vesting</span>
+                <h2 class="section-title">NFT Holder Breakdown</h2>
+            </div>
+            <div class="table-section-meta">
+                <div class="search-wrapper sonar-search" style="flex:1; margin-bottom:0;">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" id="patronSearch" placeholder="Search wallet address..." onkeyup="searchPatrons()" autocomplete="off" />
+                </div>
+                <span class="table-count-badge" id="patronCountBadge">— holders</span>
+            </div>
+            <div class="table-container" id="patronTableContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Wallet</th>
+                            <th>NFTs</th>
+                            <th>INX Allocated</th>
+                            <th>INX Claimed</th>
+                            <th>Locked Vested</th>
+                            <th>Linear Vested</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patronTableBody"></tbody>
+                </table>
+                <div class="loading-indicator" id="patronLoadingIndicator">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </section>
+
+    </div><!-- /.container -->
+
+    <footer>
+        <a href="https://infinex.xyz" target="_blank" rel="noopener">infinex.xyz</a>
+        <span class="separator">•</span>
+        <a href="https://x.com/infinex" target="_blank" rel="noopener">@infinex</a>
+        <span class="separator">•</span>
+        <a href="https://x.com/0xAirr" target="_blank" rel="noopener">@0xAirr</a>
+        <a href="https://x.com/MazinoTower" target="_blank" rel="noopener">@MazinoTower</a>
+    </footer>
+
+    <script src="sonar-data.js"></script>
+    <script>
+    // ── Helpers ──────────────────────────────────────────
+    function escapeHtml(t) {
+        const d = document.createElement('div');
+        d.textContent = t;
+        return d.innerHTML;
+    }
+
+    function truncWallet(addr) {
+        if (!addr || addr.length < 10) return addr;
+        return addr.slice(0, 6) + '...' + addr.slice(-4);
+    }
+
+    function fmtINX(n) {
+        if (n >= 1e6)  return (n / 1e6).toFixed(2) + 'M';
+        if (n >= 1e3)  return (n / 1e3).toFixed(1) + 'K';
+        return n.toLocaleString();
+    }
+
+    function fmtINXFull(n) {
+        return Number(n).toLocaleString();
+    }
+
+    function fmtUSD(n) {
+        return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // ── Loader ───────────────────────────────────────────
+    const loaderScreen   = document.getElementById('loaderScreen');
+    const loaderProgress = document.getElementById('loaderProgress');
+    let loaderDone = false;
+    let progress   = 0;
+
+    function updateLoader() {
+        progress += Math.random() * 18 + 6;
+        if (progress > 100) progress = 100;
+        loaderProgress.style.width = progress + '%';
+        if (progress < 100) {
+            setTimeout(updateLoader, 130);
+        } else {
+            setTimeout(() => {
+                loaderScreen.classList.add('fade-out');
+                setTimeout(() => {
+                    loaderScreen.style.display = 'none';
+                    loaderDone = true;
+                    animateDistBar();
+                }, 500);
+            }, 280);
+        }
+    }
+
+    // ── KPI Cards ────────────────────────────────────────
+    function renderKPIs() {
+        const o = SONAR_OVERVIEW;
+        document.getElementById('kpi-participants').textContent = o.participants.toLocaleString();
+        document.getElementById('kpi-allocated').textContent   = fmtINX(o.inx_allocated);
+        document.getElementById('kpi-vested').textContent      = fmtINX(o.inx_vested);
+        document.getElementById('kpi-vested-pct').textContent  = o.inx_vested_pct + '%';
+        document.getElementById('kpi-claimed').textContent     = fmtINX(o.inx_claimed);
+        document.getElementById('kpi-claimed-pct').textContent = o.inx_claimed_pct + '%';
+        document.getElementById('kpi-claimants').textContent   = o.claimants.toLocaleString();
+        document.getElementById('kpi-claimants-2').textContent = o.claimants.toLocaleString();
+        document.getElementById('kpi-fees').textContent        = fmtUSD(o.early_unlock_fees);
+        document.getElementById('kpi-avg-fee').textContent     = fmtUSD(o.early_unlock_avg);
+        document.getElementById('lastUpdatedText').textContent = 'Updated ' + SONAR_LAST_UPDATED;
+    }
+
+    // ── Distribution Bar ─────────────────────────────────
+    function renderDistLegend() {
+        const legend = document.getElementById('distLegend');
+        const colors = ['#F76B1C', '#ff9a4d', '#444'];
+        SONAR_DISTRIBUTION.forEach((item, i) => {
+            const el = document.createElement('div');
+            el.className = 'dist-legend-item';
+            el.innerHTML = `
+                <div class="dist-legend-label">
+                    <span class="dist-dot" style="background:${colors[i]}"></span>
+                    ${escapeHtml(item.label)}
+                </div>
+                <span class="dist-legend-value">${fmtINX(item.value)}</span>
+                <span class="dist-legend-pct">${item.pct}% of total</span>
+            `;
+            legend.appendChild(el);
+        });
+    }
+
+    function animateDistBar() {
+        // Only animate the first two segments; seg-locked uses flex:1
+        const seg0 = document.getElementById('seg0');
+        const seg1 = document.getElementById('seg1');
+        if (seg0) setTimeout(() => { seg0.style.width = SONAR_DISTRIBUTION[0].pct + '%'; }, 100);
+        if (seg1) setTimeout(() => { seg1.style.width = SONAR_DISTRIBUTION[1].pct + '%'; }, 180);
+    }
+
+    // ── Generic infinite-scroll table loader ─────────────
+    const BATCH = 50;
+
+    function makeTableState(data, tbodyId, loadingId, countBadgeId) {
+        return {
+            all:       data,
+            current:   data,
+            displayed: 0,
+            loading:   false,
+            tbody:     document.getElementById(tbodyId),
+            indicator: document.getElementById(loadingId),
+            badge:     document.getElementById(countBadgeId),
+        };
+    }
+
+    function loadMore(state, createRowFn) {
+        if (state.loading || state.displayed >= state.current.length) return;
+        state.loading = true;
+        state.indicator.style.display = 'flex';
+
+        setTimeout(() => {
+            const frag = document.createDocumentFragment();
+            const end  = Math.min(state.displayed + BATCH, state.current.length);
+            for (let i = state.displayed; i < end; i++) {
+                frag.appendChild(createRowFn(state.current[i]));
+            }
+            state.tbody.appendChild(frag);
+            state.displayed = end;
+            state.loading   = false;
+            state.indicator.style.display = state.displayed >= state.current.length ? 'none' : 'flex';
+            updateBadge(state);
+        }, 80);
+    }
+
+    function resetTable(state, filtered, createRowFn) {
+        state.tbody.innerHTML = '';
+        state.current   = filtered;
+        state.displayed = 0;
+        state.loading   = false;
+        updateBadge(state);
+        loadMore(state, createRowFn);
+    }
+
+    function updateBadge(state) {
+        if (state.badge) state.badge.textContent = state.current.length.toLocaleString() + ' entries';
+    }
+
+    // ── Sonar Wallets Table ───────────────────────────────
+    function createWalletRow(item) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><span class="wallet-addr">${escapeHtml(truncWallet(item.wallet))}</span></td>
+            <td><span class="val-usdc">${fmtUSD(item.usdc_deposited)}</span></td>
+            <td><span class="val-inx">${fmtINXFull(item.inx_allocated)}</span></td>
+            <td><span class="val-inx">${fmtINXFull(item.inx_claimed)}</span></td>
+            <td><span class="val-fee">${fmtUSD(item.early_unlock_fee)}</span></td>
+            <td><span class="val-inx">${fmtINXFull(item.inx_vested)}</span></td>
+        `;
+        return tr;
+    }
+
+    let walletState;
+
+    function searchWallets() {
+        const q = document.getElementById('walletSearch').value.toLowerCase();
+        const filtered = SONAR_WALLETS.filter(w => w.wallet.toLowerCase().includes(q));
+        resetTable(walletState, filtered, createWalletRow);
+    }
+
+    // ── Patron Vesting Table ─────────────────────────────
+    function createPatronRow(item) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><span class="wallet-addr">${escapeHtml(truncWallet(item.wallet))}</span></td>
+            <td><span class="val-nft">${item.nft_count}</span></td>
+            <td><span class="val-inx">${fmtINXFull(item.inx_allocated)}</span></td>
+            <td><span class="val-inx">${item.inx_claimed > 0 ? fmtINXFull(item.inx_claimed) : '<span class="val-neutral">—</span>'}</span></td>
+            <td><span class="val-neutral">${item.locked_vested > 0 ? fmtINXFull(item.locked_vested) : '—'}</span></td>
+            <td><span class="val-inx">${fmtINXFull(item.linear_vested)}</span></td>
+        `;
+        return tr;
+    }
+
+    let patronState;
+
+    function searchPatrons() {
+        const q = document.getElementById('patronSearch').value.toLowerCase();
+        const filtered = PATRON_VESTING.filter(w => w.wallet.toLowerCase().includes(q));
+        resetTable(patronState, filtered, createPatronRow);
+    }
+
+    // ── Scroll listeners ─────────────────────────────────
+    function attachScroll(containerId, state, createRowFn) {
+        document.getElementById(containerId).addEventListener('scroll', function () {
+            if (this.scrollTop + this.clientHeight >= this.scrollHeight - 200) {
+                loadMore(state, createRowFn);
+            }
+        });
+    }
+
+    // ── Init ─────────────────────────────────────────────
+    if (typeof SONAR_OVERVIEW !== 'undefined') {
+        renderKPIs();
+        renderDistLegend();
+
+        walletState = makeTableState(SONAR_WALLETS, 'walletTableBody', 'walletLoadingIndicator', 'walletCountBadge');
+        patronState = makeTableState(PATRON_VESTING, 'patronTableBody', 'patronLoadingIndicator', 'patronCountBadge');
+
+        loadMore(walletState, createWalletRow);
+        loadMore(patronState, createPatronRow);
+
+        attachScroll('walletTableContainer', walletState, createWalletRow);
+        attachScroll('patronTableContainer', patronState, createPatronRow);
+
+        updateLoader();
+    }
+    </script>
+
+</body>
+</html>
