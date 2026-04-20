@@ -1,0 +1,30 @@
+name: Refresh Sonar Data
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday 6am UTC
+  workflow_dispatch:      # Manual trigger anytime
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Dune data and rebuild sonar-data.js
+        env:
+          DUNE_API_KEY: ${{ secrets.DUNE_API_KEY }}
+        run: node refresh.mjs
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sonar-data.js
+          git diff --staged --quiet && echo "No changes." || (
+            git commit -m "Auto-refresh Sonar data $(date -u '+%Y-%m-%d')" &&
+            git push
+          )
