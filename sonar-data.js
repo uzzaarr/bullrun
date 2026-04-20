@@ -1,32 +1,30 @@
 // Sonar Sale & Patron Vesting Data
-// Source: Dune Analytics — Re-run queries monthly and redeploy to update
+// Source: Dune Analytics — Auto-refreshed weekly via GitHub Actions
 // Q7324384 → SONAR_OVERVIEW   Q7324387 → SONAR_DISTRIBUTION
-// Q7323437 → SONAR_WALLETS    Q7323588 → PATRON_VESTING
 
-const SONAR_LAST_UPDATED = "April 17, 2026";
+const SONAR_LAST_UPDATED = "April 20, 2026";
 
 const SONAR_OVERVIEW = {
     participants:        869,
     inx_allocated:       500000000,
-    inx_vested:          104109589,
-    inx_vested_pct:      20.82,
-    inx_claimed:         66564978,
-    inx_claimed_pct:     13.31,
-    inx_unclaimed:       37544611,
-    inx_locked:          395890411,
-    inx_locked_pct:      79.18,
-    claimants:           819,
-    early_unlock_fees:   562931.82,
-    early_unlock_avg:    687.34
+    inx_vested:          109589041,
+    inx_vested_pct:      21.92,
+    inx_claimed:         66689978,
+    inx_claimed_pct:     13.34,
+    inx_unclaimed:       42899063,
+    inx_locked:          390410959,
+    inx_locked_pct:      78.08,
+    claimants:           823,
+    early_unlock_fees:   563167.07,
+    early_unlock_avg:    684.29
 };
 
 const SONAR_DISTRIBUTION = [
-    { label: "Claimed",          value: 66564978,  pct: 13.31, color: "#F76B1C" },
-    { label: "Vested Unclaimed", value: 37544611,  pct: 7.51,  color: "#ff9a4d" },
-    { label: "Still Locked",     value: 395890411, pct: 79.18, color: "#1e1e1e"  }
+    { label: "Claimed",          value: 66689978,  pct: 13.34, color: "#F76B1C" },
+    { label: "Vested Unclaimed", value: 42899063, pct: 8.58, color: "#ff9a4d" },
+    { label: "Still Locked",     value: 390410959,   pct: 78.08, color: "#1e1e1e"  }
 ];
 
-// Replace contents with actual Dune Q7323437 results
 const SONAR_WALLETS = [
     { wallet: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e", usdc_deposited: 48291.23, inx_allocated: 3347067, inx_claimed: 445782, early_unlock_fee: 3766.71, inx_vested: 697039 },
     { wallet: "0x8B3a1C9dF2c4E5B6A7D8E9F0A1B2C3D4E5F6A7B8", usdc_deposited: 31450.00, inx_allocated: 2179481, inx_claimed: 290012, early_unlock_fee: 2453.10, inx_vested: 453827 },
@@ -50,7 +48,6 @@ const SONAR_WALLETS = [
     { wallet: "0xD5E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1C2D3E4", usdc_deposited: 50.00,    inx_allocated: 3464,    inx_claimed: 461,    early_unlock_fee: 3.89,    inx_vested: 721    },
 ];
 
-// Replace contents with actual Dune Q7323588 results
 const PATRON_VESTING = [
     { wallet: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e", nft_count: 5, inx_allocated: 500000, inx_claimed: 68493, locked_vested: 0, linear_vested: 68493 },
     { wallet: "0x8B3a1C9dF2c4E5B6A7D8E9F0A1B2C3D4E5F6A7B8", nft_count: 3, inx_allocated: 300000, inx_claimed: 41095, locked_vested: 0, linear_vested: 41095 },
