@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>INX Price Chart — Infinex</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sonar.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        .timeframe-bar {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .tf-btn {
+            padding: 8px 20px;
+            border-radius: 100px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font-main);
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tf-btn:hover {
+            border-color: rgba(247, 107, 28, 0.45);
+            color: var(--accent-color);
+        }
+        .tf-btn.active {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: rgba(247, 107, 28, 0.07);
+            box-shadow: 0 0 18px rgba(247, 107, 28, 0.18);
+        }
+        #chart-container {
+            height: 520px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(20px);
+        }
+        #chart-error {
+            display: none;
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+        @media (max-width: 768px) {
+            #chart-container { height: 380px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loader -->
+    <div class="loader-screen" id="loaderScreen">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
+                <div class="loader-glow"></div>
+            </div>
+            <div class="loader-bar">
+                <div class="loader-progress" id="loaderProgress"></div>
+            </div>
+            <p class="loader-text">Loading Chart...</p>
+        </div>
+    </div>
+
+    <!-- Page Nav -->
+    <nav class="page-nav">
+        <a href="/" class="nav-link">Leaderboard</a>
+        <a href="/sonar" class="nav-link">Sonar Analytics</a>
+        <a href="/whales" class="nav-link">Whale Tracker</a>
+        <a href="/chart" class="nav-link active">Chart</a>
+    </nav>
+
+    <div class="container sonar-container">
+
+        <!-- Header -->
+        <header class="sonar-header">
+            <div class="logo-wrapper">
+                <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
+                <div class="logo-glow"></div>
+            </div>
+            <h1>INX Price Chart</h1>
+            <p class="subtitle">INX/USD · CoinGecko · TradingView Lightweight Charts</p>
+            <div class="last-updated" id="priceBadge">
+                <span class="last-updated-dot"></span>
+                <span id="priceText">Loading...</span>
+            </div>
+        </header>
+
+        <!-- Chart Section -->
+        <section class="section">
+            <div class="timeframe-bar">
+                <button class="tf-btn" data-days="1">1D</button>
+                <button class="tf-btn active" data-days="7">7D</button>
+                <button class="tf-btn" data-days="30">30D</button>
+                <button class="tf-btn" data-days="90">90D</button>
+            </div>
+            <div id="chart-container"></div>
+            <div id="chart-error">Failed to load chart data. Please try again later.</div>
+        </section>
+
+    </div><!-- /.container -->
+
+    <footer>
+        <a href="https://infinex.xyz" target="_blank" rel="noopener">infinex.xyz</a>
+        <span class="separator">•</span>
+        <a href="https://x.com/infinex" target="_blank" rel="noopener">@infinex</a>
+        <span class="separator">•</span>
+        <a href="https://x.com/0xAirr" target="_blank" rel="noopener">@0xAirr</a>
+        <a href="https://x.com/MazinoTower" target="_blank" rel="noopener">@MazinoTower</a>
+    </footer>
+
+    <script>
+    // ── Loader ───────────────────────────────────────────
+    const loaderScreen   = document.getElementById('loaderScreen');
+    const loaderProgress = document.getElementById('loaderProgress');
+    let progress = 0;
+
+    function updateLoader() {
+        progress += Math.random() * 18 + 6;
+        if (progress > 100) progress = 100;
+        loaderProgress.style.width = progress + '%';
+        if (progress < 100) {
+            setTimeout(updateLoader, 130);
+        } else {
+            setTimeout(() => {
+                loaderScreen.classList.add('fade-out');
+                setTimeout(() => { loaderScreen.style.display = 'none'; }, 500);
+            }, 300);
+        }
+    }
+
+    // ── Chart setup ──────────────────────────────────────
+    const container = document.getElementById('chart-container');
+    const errorEl   = document.getElementById('chart-error');
+
+    const chart = LightweightCharts.createChart(container, {
+        width:  container.clientWidth,
+        height: container.clientHeight,
+        layout: {
+            background: { type: 'solid', color: '#000000' },
+            textColor: '#888888',
+            fontFamily: "'JetBrains Mono', monospace",
+        },
+        grid: {
+            vertLines: { color: '#1a1a1a' },
+            horzLines: { color: '#1a1a1a' },
+        },
+        crosshair: {
+            mode: LightweightCharts.CrosshairMode.Magnet,
+            vertLine: { color: 'rgba(247,107,28,0.5)', labelBackgroundColor: '#F76B1C' },
+            horzLine: { color: 'rgba(247,107,28,0.5)', labelBackgroundColor: '#F76B1C' },
+        },
+        rightPriceScale: { borderColor: '#1a1a1a' },
+        timeScale: { borderColor: '#1a1a1a', timeVisible: true, secondsVisible: false },
+        handleScroll: true,
+        handleScale: true,
+    });
+
+    const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+        upColor:      '#F76B1C',
+        downColor:    '#555555',
+        borderVisible: false,
+        wickUpColor:   '#F76B1C',
+        wickDownColor: '#555555',
+    });
+
+    candleSeries.priceScale().applyOptions({ scaleMargins: { top: 0.05, bottom: 0.05 } });
+
+    window.addEventListener('resize', () => {
+        chart.applyOptions({ width: container.clientWidth });
+    });
+
+    // ── Data loading ─────────────────────────────────────
+    async function loadChart(days) {
+        try {
+            const res  = await fetch(`/api/inx-chart?days=${days}`);
+            const { data } = await res.json();
+            if (!data || data.length === 0) throw new Error('empty');
+            candleSeries.setData(data);
+            chart.timeScale().fitContent();
+            container.style.display = '';
+            errorEl.style.display   = 'none';
+        } catch {
+            container.style.display = 'none';
+            errorEl.style.display   = 'block';
+        }
+    }
+
+    // ── Price badge ──────────────────────────────────────
+    async function fetchPrice() {
+        try {
+            const res = await fetch('/api/inx-price');
+            const { price } = await res.json();
+            if (price != null) {
+                document.getElementById('priceText').textContent =
+                    '$' + price.toFixed(price < 0.01 ? 6 : 4) + ' USD';
+            }
+        } catch { /* leave as Loading... */ }
+    }
+
+    // ── Timeframe buttons ────────────────────────────────
+    document.querySelectorAll('.tf-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadChart(btn.dataset.days);
+        });
+    });
+
+    // ── Init ─────────────────────────────────────────────
+    Promise.all([loadChart(7), fetchPrice()]).then(() => updateLoader());
+    </script>
+
+</body>
+</html>
