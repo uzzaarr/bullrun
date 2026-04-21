@@ -29,4 +29,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add whale-data.js
           git diff --staged --quiet || git commit -m "chore: auto-refresh whale data"
+          git pull --rebase
           git push

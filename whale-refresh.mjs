@@ -47,6 +47,8 @@ async function fetchLabel(address) {
       `https://api.arkhamintelligence.com/intelligence/address/${address}/all`,
       { 'API-Key': ARKHAM_KEY }
     );
+    if (!data) { console.warn(`  Arkham: null response for ${address}`); return null; }
+    if (data.code === 429 || data.statusCode === 429) { console.warn('  Arkham: rate limited (429)'); return null; }
     return data?.ethereum?.arkhamEntity?.id ?? null;
   } catch {
     return null;
@@ -60,6 +62,7 @@ const url = `https://api.etherscan.io/v2/api?chainid=1&module=account&action=tok
 console.log(`Fetching last ${FETCH_LIMIT} INX transfers from Etherscan...`);
 const res = await get(url);
 
+if (!res) throw new Error('Etherscan: empty or non-JSON response');
 if (res.status !== '1') throw new Error('Etherscan: ' + res.result);
 
 const allTxs = res.result;
@@ -97,6 +100,7 @@ for (const tx of txs) {
   if (!EXCLUDE.has(to)) {
     const w = walletMap.get(to) || { received: 0, sent: 0, txs: 0 };
     w.received += amount;
+    w.txs++;
     walletMap.set(to, w);
   }
 }
@@ -140,7 +144,7 @@ if (ARKHAM_KEY) {
 }
 
 // ── Write output ──────────────────────────────────────────────────────────────
-const now        = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const now        = new Date().toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
 const biggestTx  = largeTxs.length ? largeTxs.reduce((a, b) => b.amount > a.amount ? b : a) : null;
 const totalWhale = largeTxs.reduce((s, t) => s + t.amount, 0);
 

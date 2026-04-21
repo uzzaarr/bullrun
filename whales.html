@@ -335,7 +335,12 @@
 
         // ── Transfers table ───────────────────────────────────────
         const BATCH = 50;
-        const txState = { current: WHALE_TRANSFERS.slice(), displayed: 0, loading: false };
+        const txState = {
+            current:   typeof WHALE_TRANSFERS !== 'undefined' ? WHALE_TRANSFERS.slice() : [],
+            displayed: 0,
+            loading:   false,
+            gen:       0,
+        };
 
         function createTxRow(tx) {
             const tr = document.createElement('tr');
@@ -371,10 +376,12 @@
         function renderTxBatch() {
             if (txState.loading || txState.displayed >= txState.current.length) return;
             txState.loading = true;
-            const loader = document.getElementById('transfersLoader');
+            const loader  = document.getElementById('transfersLoader');
             loader.style.display = 'flex';
+            const myGen = txState.gen;
 
             setTimeout(() => {
+                if (myGen !== txState.gen) return;
                 const frag = document.createDocumentFragment();
                 const end  = Math.min(txState.displayed + BATCH, txState.current.length);
                 for (let i = txState.displayed; i < end; i++) {
@@ -391,6 +398,7 @@
 
         function searchTransfers() {
             const q = document.getElementById('transferSearch').value.toLowerCase().trim();
+            txState.gen++;
             txState.current = q
                 ? WHALE_TRANSFERS.filter(tx =>
                     tx.from.toLowerCase().includes(q) ||
