@@ -1,5 +1,5 @@
 // INX Whale Tracker — Etherscan V2 API
-// Fetches last 5000 INX transfers, finds large ones, tracks accumulation
+// Fetches last 5000 INX transfers, filters to 24h window, finds large ones
 import https from 'https';
 import fs   from 'fs';
 
@@ -7,6 +7,7 @@ const KEY      = process.env.ETHERSCAN_API_KEY;
 const CONTRACT = '0xdeF1b2D939EdC0E4d35806c59b3166F790175afe';
 const WHALE_THRESHOLD = 100_000; // INX — transfers above this are "whale" moves
 const FETCH_LIMIT     = 5000;
+const CUTOFF_24H      = Math.floor(Date.now() / 1000) - 86400;
 
 // Known DEX routers / null address — exclude from accumulation stats
 const EXCLUDE = new Set([
@@ -42,8 +43,9 @@ const res = await get(url);
 
 if (res.status !== '1') throw new Error('Etherscan: ' + res.result);
 
-const txs = res.result;
-console.log(`Got ${txs.length} transfers`);
+const allTxs = res.result;
+const txs    = allTxs.filter(tx => parseInt(tx.timeStamp) >= CUTOFF_24H);
+console.log(`Got ${allTxs.length} transfers, ${txs.length} in last 24h`);
 
 const largeTxs  = [];
 const walletMap = new Map();
@@ -100,7 +102,7 @@ const totalWhale = largeTxs.reduce((s, t) => s + t.amount, 0);
 const output = [
   '// INX Whale Tracker Data',
   '// Source: Etherscan V2 — Auto-refreshed every 6h via GitHub Actions',
-  `// Whale threshold: ${WHALE_THRESHOLD.toLocaleString()} INX | Last ${txs.length} transfers scanned`,
+  `// Whale threshold: ${WHALE_THRESHOLD.toLocaleString()} INX | Last 24h window`,
   '',
   `const WHALE_LAST_UPDATED      = "${now}";`,
   `const WHALE_THRESHOLD         = ${WHALE_THRESHOLD};`,
