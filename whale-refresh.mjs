@@ -3,13 +3,14 @@
 import https from 'https';
 import fs   from 'fs';
 
-const KEY      = process.env.ETHERSCAN_API_KEY;
-const CONTRACT = '0xdeF1b2D939EdC0E4d35806c59b3166F790175afe';
-const WHALE_THRESHOLD = 100_000; // INX — transfers above this are "whale" moves
+const KEY           = process.env.ETHERSCAN_API_KEY;
+const ARKHAM_KEY    = process.env.ARKHAM_API_KEY;
+const CONTRACT      = '0xdeF1b2D939EdC0E4d35806c59b3166F790175afe';
+const WHALE_THRESHOLD = 100_000;
 const FETCH_LIMIT     = 5000;
 const CUTOFF_24H      = Math.floor(Date.now() / 1000) - 86400;
 
-// Known DEX routers / null address — exclude from accumulation stats
+// Known DEX routers / null address — used for buy/sell classification and exclusion
 const EXCLUDE = new Set([
   '0x0000000000000000000000000000000000000000',
   '0x7a250d5630b4cf539739df2c5dacb4c659f2488d', // Uniswap V2 Router
@@ -18,23 +19,41 @@ const EXCLUDE = new Set([
   '0x000000000004444c5dc75cb358380d2e3de08a90', // aggregator seen in data
 ]);
 
-function get(url) {
+function get(url, headers = {}) {
   return new Promise((resolve, reject) => {
-    const req = https.request(url, res => {
+    const req = https.request(url, { headers }, res => {
       let d = '';
       res.on('data', c => d += c);
-      res.on('end', () => resolve(JSON.parse(d)));
+      res.on('end', () => {
+        try { resolve(JSON.parse(d)); } catch { resolve(null); }
+      });
     });
     req.on('error', reject);
     req.end();
   });
 }
 
-// Convert raw 18-decimal string to INX number (2dp precision)
 function toINX(raw) {
   return Number(BigInt(raw) / 10n ** 16n) / 100;
 }
 
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+async function fetchLabel(address) {
+  try {
+    const data = await get(
+      `https://api.arkhamintelligence.com/intelligence/address/${address}/all`,
+      { 'API-Key': ARKHAM_KEY }
+    );
+    return data?.ethereum?.arkhamEntity?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// ── Etherscan fetch ───────────────────────────────────────────────────────────
 const url = `https://api.etherscan.io/v2/api?chainid=1&module=account&action=tokentx` +
   `&contractaddress=${CONTRACT}&page=1&offset=${FETCH_LIMIT}&sort=desc&apikey=${KEY}`;
 
@@ -55,8 +74,9 @@ for (const tx of txs) {
   const from   = tx.from.toLowerCase();
   const to     = tx.to.toLowerCase();
 
-  // Large transfer log
   if (amount >= WHALE_THRESHOLD) {
+    // Classify: if tokens flow FROM a DEX → wallet received (buy); TO a DEX → sell
+    const type = EXCLUDE.has(from) ? 'buy' : EXCLUDE.has(to) ? 'sell' : 'transfer';
     largeTxs.push({
       hash:   tx.hash,
       ts:     parseInt(tx.timeStamp),
@@ -64,10 +84,10 @@ for (const tx of txs) {
       to:     tx.to,
       amount: Math.round(amount),
       block:  parseInt(tx.blockNumber),
+      type,
     });
   }
 
-  // Accumulation: track inflow/outflow per wallet (skip DEX contracts)
   if (!EXCLUDE.has(from)) {
     const w = walletMap.get(from) || { received: 0, sent: 0, txs: 0 };
     w.sent += amount;
@@ -81,7 +101,6 @@ for (const tx of txs) {
   }
 }
 
-// Top 50 net accumulators (received - sent, sorted desc)
 const accumulators = Array.from(walletMap.entries())
   .map(([wallet, d]) => ({
     wallet,
@@ -94,10 +113,40 @@ const accumulators = Array.from(walletMap.entries())
   .sort((a, b) => b.net - a.net)
   .slice(0, 50);
 
-const now = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+// ── Arkham label lookups ──────────────────────────────────────────────────────
+const labels = {};
+if (ARKHAM_KEY) {
+  const addrSet = new Set();
+  for (const w of accumulators) addrSet.add(w.wallet.toLowerCase());
+  for (const t of largeTxs) {
+    addrSet.add(t.from.toLowerCase());
+    addrSet.add(t.to.toLowerCase());
+  }
+  for (const dex of EXCLUDE) addrSet.delete(dex);
 
+  const addrs = Array.from(addrSet);
+  console.log(`Looking up ${addrs.length} addresses on Arkham...`);
+  for (const addr of addrs) {
+    const label = await fetchLabel(addr);
+    if (label) {
+      labels[addr] = label;
+      console.log(`  ${addr} → ${label}`);
+    }
+    await sleep(1100);
+  }
+  console.log(`Arkham: found ${Object.keys(labels).length} labels`);
+} else {
+  console.log('No ARKHAM_API_KEY — skipping label lookup');
+}
+
+// ── Write output ──────────────────────────────────────────────────────────────
+const now        = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 const biggestTx  = largeTxs.length ? largeTxs.reduce((a, b) => b.amount > a.amount ? b : a) : null;
 const totalWhale = largeTxs.reduce((s, t) => s + t.amount, 0);
+
+const labelEntries = Object.entries(labels)
+  .map(([addr, name]) => `    "${addr}": "${name.replace(/"/g, '\\"')}"`)
+  .join(',\n');
 
 const output = [
   '// INX Whale Tracker Data',
@@ -112,7 +161,7 @@ const output = [
   '',
   'const WHALE_TRANSFERS = [',
   largeTxs.map(t =>
-    `    { hash: "${t.hash}", ts: ${t.ts}, from: "${t.from}", to: "${t.to}", amount: ${t.amount}, block: ${t.block} }`
+    `    { hash: "${t.hash}", ts: ${t.ts}, from: "${t.from}", to: "${t.to}", amount: ${t.amount}, block: ${t.block}, type: "${t.type}" }`
   ).join(',\n'),
   '];',
   '',
@@ -121,6 +170,10 @@ const output = [
     `    { wallet: "${w.wallet}", net: ${w.net}, received: ${w.received}, sent: ${w.sent}, txs: ${w.txs} }`
   ).join(',\n'),
   '];',
+  '',
+  'const WHALE_LABELS = {',
+  labelEntries,
+  '};',
   '',
 ].join('\n');
 

@@ -19,6 +19,7 @@ jobs:
         run: node whale-refresh.mjs
         env:
           ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+          ARKHAM_API_KEY: ${{ secrets.ARKHAM_API_KEY }}
 
       - name: Commit and push whale-data.js
         run: |

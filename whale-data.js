@@ -1825,3 +1825,5 @@ const WHALE_ACCUMULATORS = [
     { wallet: "0xac09821000e851c0e668f25ce9342d18cc2d660d", net: 66667, received: 66667, sent: 0, txs: 0 },
     { wallet: "0x57ba479e67ae2107ebf5b4bf6f45761eeacbdbba", net: 63014, received: 63014, sent: 0, txs: 0 }
 ];
+
+const WHALE_LABELS = {};
