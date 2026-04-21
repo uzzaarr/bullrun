@@ -100,9 +100,9 @@
 
     <!-- Page Nav -->
     <nav class="page-nav">
-        <a href="index.html" class="nav-link">Leaderboard</a>
-        <a href="sonar.html" class="nav-link">Sonar Analytics</a>
-        <a href="whales.html" class="nav-link active">Whale Tracker</a>
+        <a href="/" class="nav-link">Leaderboard</a>
+        <a href="/sonar" class="nav-link">Sonar Analytics</a>
+        <a href="/whales" class="nav-link active">Whale Tracker</a>
     </nav>
 
     <div class="container sonar-container">
@@ -265,6 +265,27 @@
             }
         }
 
+        // ── INX Price ─────────────────────────────────────────────
+        let inxPrice = null;
+
+        async function fetchInxPrice() {
+            try {
+                const res = await fetch('/api/inx-price');
+                const { price } = await res.json();
+                inxPrice = price;
+            } catch (e) {
+                inxPrice = null;
+            }
+        }
+
+        function fmtUsd(inxAmount) {
+            if (!inxPrice) return '';
+            const usd = inxAmount * inxPrice;
+            if (usd >= 1e6) return '($' + (usd / 1e6).toFixed(2) + 'M)';
+            if (usd >= 1e3) return '($' + (usd / 1e3).toFixed(1) + 'K)';
+            return '($' + usd.toFixed(2) + ')';
+        }
+
         // ── Utilities ─────────────────────────────────────────────
         function fmt(n) { return Number(n).toLocaleString(); }
 
@@ -324,13 +345,13 @@
             document.getElementById('kpiScanned').textContent =
                 fmt(WHALE_TRANSFERS_SCANNED);
             document.getElementById('kpiThreshold').textContent =
-                fmt(WHALE_THRESHOLD) + ' INX';
+                fmt(WHALE_THRESHOLD) + ' INX' + (inxPrice ? ' ' + fmtUsd(WHALE_THRESHOLD) : '');
             document.getElementById('kpiCount').textContent =
                 fmt(WHALE_TRANSFERS.length);
             document.getElementById('kpiVolume').textContent =
-                fmt(WHALE_TOTAL_VOLUME) + ' INX';
+                fmt(WHALE_TOTAL_VOLUME) + ' INX' + (inxPrice ? ' ' + fmtUsd(WHALE_TOTAL_VOLUME) : '');
             document.getElementById('kpiBiggest').textContent =
-                fmt(WHALE_BIGGEST_SINGLE) + ' INX';
+                fmt(WHALE_BIGGEST_SINGLE) + ' INX' + (inxPrice ? ' ' + fmtUsd(WHALE_BIGGEST_SINGLE) : '');
         }
 
         // ── Transfers table ───────────────────────────────────────
@@ -358,7 +379,16 @@
             toCell.appendChild(addrLink(tx.to));
 
             const amtCell = document.createElement('td');
-            amtCell.innerHTML = `<span class="val-inx">${fmt(tx.amount)}</span>`;
+            const amtSpan = document.createElement('span');
+            amtSpan.className = 'val-inx';
+            amtSpan.textContent = fmt(tx.amount);
+            amtCell.appendChild(amtSpan);
+            if (inxPrice) {
+                const usdSpan = document.createElement('span');
+                usdSpan.style.cssText = 'font-size:11px;color:var(--text-tertiary);margin-left:4px';
+                usdSpan.textContent = fmtUsd(tx.amount);
+                amtCell.appendChild(usdSpan);
+            }
 
             const hashCell = document.createElement('td');
             const hashA = document.createElement('a');
@@ -429,13 +459,40 @@
             walletCell.appendChild(addrLink(w.wallet));
 
             const netCell = document.createElement('td');
-            netCell.innerHTML = `<span class="${w.net >= 0 ? 'val-net-pos' : 'val-net-neg'}">${w.net >= 0 ? '+' : ''}${fmt(w.net)}</span>`;
+            const netSpan = document.createElement('span');
+            netSpan.className = w.net >= 0 ? 'val-net-pos' : 'val-net-neg';
+            netSpan.textContent = (w.net >= 0 ? '+' : '') + fmt(w.net);
+            netCell.appendChild(netSpan);
+            if (inxPrice) {
+                const netUsd = document.createElement('span');
+                netUsd.style.cssText = 'font-size:11px;color:var(--text-tertiary);margin-left:4px';
+                netUsd.textContent = fmtUsd(Math.abs(w.net));
+                netCell.appendChild(netUsd);
+            }
 
             const rcvCell = document.createElement('td');
-            rcvCell.innerHTML = `<span class="val-inx">${fmt(w.received)}</span>`;
+            const rcvSpan = document.createElement('span');
+            rcvSpan.className = 'val-inx';
+            rcvSpan.textContent = fmt(w.received);
+            rcvCell.appendChild(rcvSpan);
+            if (inxPrice) {
+                const rcvUsd = document.createElement('span');
+                rcvUsd.style.cssText = 'font-size:11px;color:var(--text-tertiary);margin-left:4px';
+                rcvUsd.textContent = fmtUsd(w.received);
+                rcvCell.appendChild(rcvUsd);
+            }
 
             const sentCell = document.createElement('td');
-            sentCell.innerHTML = `<span class="val-neutral">${fmt(w.sent)}</span>`;
+            const sentSpan = document.createElement('span');
+            sentSpan.className = 'val-neutral';
+            sentSpan.textContent = fmt(w.sent);
+            sentCell.appendChild(sentSpan);
+            if (inxPrice) {
+                const sentUsd = document.createElement('span');
+                sentUsd.style.cssText = 'font-size:11px;color:var(--text-tertiary);margin-left:4px';
+                sentUsd.textContent = fmtUsd(w.sent);
+                sentCell.appendChild(sentUsd);
+            }
 
             const txsCell = document.createElement('td');
             txsCell.innerHTML = `<span class="val-neutral">${w.txs}</span>`;
@@ -468,9 +525,11 @@
         // ── Init ──────────────────────────────────────────────────
         if (typeof WHALE_TRANSFERS !== 'undefined') {
             updateLoader();
-            populateKPIs();
-            renderTxBatch();
-            renderAccumulators(WHALE_ACCUMULATORS);
+            fetchInxPrice().then(() => {
+                populateKPIs();
+                renderTxBatch();
+                renderAccumulators(WHALE_ACCUMULATORS);
+            });
         }
     </script>
 

@@ -29,9 +29,9 @@
 
     <!-- Page Nav -->
     <nav class="page-nav">
-        <a href="index.html" class="nav-link">Leaderboard</a>
-        <a href="sonar.html" class="nav-link active">Sonar Analytics</a>
-        <a href="whales.html" class="nav-link">Whale Tracker</a>
+        <a href="/" class="nav-link">Leaderboard</a>
+        <a href="/sonar" class="nav-link active">Sonar Analytics</a>
+        <a href="/whales" class="nav-link">Whale Tracker</a>
     </nav>
 
     <div class="container sonar-container">
@@ -215,6 +215,27 @@
 
     <script src="sonar-data.js"></script>
     <script>
+    // ── INX Price ────────────────────────────────────────
+    let inxPrice = null;
+
+    async function fetchInxPrice() {
+        try {
+            const res = await fetch('/api/inx-price');
+            const { price } = await res.json();
+            inxPrice = price;
+        } catch (e) {
+            inxPrice = null;
+        }
+    }
+
+    function inxUsd(n) {
+        if (!inxPrice) return '';
+        const usd = n * inxPrice;
+        if (usd >= 1e6) return '($' + (usd / 1e6).toFixed(2) + 'M)';
+        if (usd >= 1e3) return '($' + (usd / 1e3).toFixed(1) + 'K)';
+        return '($' + usd.toFixed(2) + ')';
+    }
+
     // ── Helpers ──────────────────────────────────────────
     function escapeHtml(t) {
         const d = document.createElement('div');
@@ -269,10 +290,10 @@
     function renderKPIs() {
         const o = SONAR_OVERVIEW;
         document.getElementById('kpi-participants').textContent = o.participants.toLocaleString();
-        document.getElementById('kpi-allocated').textContent   = fmtINX(o.inx_allocated);
-        document.getElementById('kpi-vested').textContent      = fmtINX(o.inx_vested);
+        document.getElementById('kpi-allocated').textContent   = fmtINX(o.inx_allocated) + (inxPrice ? ' ' + inxUsd(o.inx_allocated) : '');
+        document.getElementById('kpi-vested').textContent      = fmtINX(o.inx_vested) + (inxPrice ? ' ' + inxUsd(o.inx_vested) : '');
         document.getElementById('kpi-vested-pct').textContent  = o.inx_vested_pct + '%';
-        document.getElementById('kpi-claimed').textContent     = fmtINX(o.inx_claimed);
+        document.getElementById('kpi-claimed').textContent     = fmtINX(o.inx_claimed) + (inxPrice ? ' ' + inxUsd(o.inx_claimed) : '');
         document.getElementById('kpi-claimed-pct').textContent = o.inx_claimed_pct + '%';
         document.getElementById('kpi-claimants').textContent   = o.claimants.toLocaleString();
         document.getElementById('kpi-claimants-2').textContent = o.claimants.toLocaleString();
@@ -363,16 +384,49 @@
     }
 
     // ── Sonar Wallets Table ───────────────────────────────
+    function makeCell(cls, text) {
+        const td = document.createElement('td');
+        const sp = document.createElement('span');
+        sp.className = cls;
+        sp.textContent = text;
+        td.appendChild(sp);
+        return td;
+    }
+
+    function appendUsd(td, n) {
+        if (!inxPrice) return;
+        const sp = document.createElement('span');
+        sp.style.cssText = 'font-size:11px;color:var(--text-tertiary);margin-left:3px';
+        sp.textContent = inxUsd(n);
+        td.appendChild(sp);
+    }
+
     function createWalletRow(item) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><span class="wallet-addr">${escapeHtml(truncWallet(item.wallet))}</span></td>
-            <td><span class="val-usdc">${fmtUSD(item.usdc_deposited)}</span></td>
-            <td><span class="val-inx">${fmtINXFull(item.inx_allocated)}</span></td>
-            <td><span class="val-inx">${fmtINXFull(item.inx_claimed)}</span></td>
-            <td><span class="val-fee">${fmtUSD(item.early_unlock_fee)}</span></td>
-            <td><span class="val-inx">${fmtINXFull(item.inx_vested)}</span></td>
-        `;
+
+        const walletTd = document.createElement('td');
+        const walletSp = document.createElement('span');
+        walletSp.className = 'wallet-addr';
+        walletSp.textContent = truncWallet(item.wallet);
+        walletTd.appendChild(walletSp);
+
+        const allocTd = makeCell('val-inx', fmtINXFull(item.inx_allocated));
+        appendUsd(allocTd, item.inx_allocated);
+
+        const claimedTd = makeCell('val-inx', fmtINXFull(item.inx_claimed));
+        appendUsd(claimedTd, item.inx_claimed);
+
+        const vestedTd = makeCell('val-inx', fmtINXFull(item.inx_vested));
+        appendUsd(vestedTd, item.inx_vested);
+
+        tr.append(
+            walletTd,
+            makeCell('val-usdc', fmtUSD(item.usdc_deposited)),
+            allocTd,
+            claimedTd,
+            makeCell('val-fee', fmtUSD(item.early_unlock_fee)),
+            vestedTd
+        );
         return tr;
     }
 
@@ -387,14 +441,50 @@
     // ── Patron Vesting Table ─────────────────────────────
     function createPatronRow(item) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><span class="wallet-addr">${escapeHtml(truncWallet(item.wallet))}</span></td>
-            <td><span class="val-nft">${item.nft_count}</span></td>
-            <td><span class="val-inx">${fmtINXFull(item.inx_allocated)}</span></td>
-            <td><span class="val-inx">${item.inx_claimed > 0 ? fmtINXFull(item.inx_claimed) : '<span class="val-neutral">—</span>'}</span></td>
-            <td><span class="val-neutral">${item.locked_vested > 0 ? fmtINXFull(item.locked_vested) : '—'}</span></td>
-            <td><span class="val-inx">${fmtINXFull(item.linear_vested)}</span></td>
-        `;
+
+        const walletTd = document.createElement('td');
+        const walletSp = document.createElement('span');
+        walletSp.className = 'wallet-addr';
+        walletSp.textContent = truncWallet(item.wallet);
+        walletTd.appendChild(walletSp);
+
+        const nftTd = makeCell('val-nft', item.nft_count);
+
+        const allocTd = makeCell('val-inx', fmtINXFull(item.inx_allocated));
+        appendUsd(allocTd, item.inx_allocated);
+
+        const claimedTd = document.createElement('td');
+        if (item.inx_claimed > 0) {
+            const sp = document.createElement('span');
+            sp.className = 'val-inx';
+            sp.textContent = fmtINXFull(item.inx_claimed);
+            claimedTd.appendChild(sp);
+            appendUsd(claimedTd, item.inx_claimed);
+        } else {
+            const sp = document.createElement('span');
+            sp.className = 'val-neutral';
+            sp.textContent = '—';
+            claimedTd.appendChild(sp);
+        }
+
+        const lockedTd = document.createElement('td');
+        if (item.locked_vested > 0) {
+            const sp = document.createElement('span');
+            sp.className = 'val-neutral';
+            sp.textContent = fmtINXFull(item.locked_vested);
+            lockedTd.appendChild(sp);
+            appendUsd(lockedTd, item.locked_vested);
+        } else {
+            const sp = document.createElement('span');
+            sp.className = 'val-neutral';
+            sp.textContent = '—';
+            lockedTd.appendChild(sp);
+        }
+
+        const linearTd = makeCell('val-inx', fmtINXFull(item.linear_vested));
+        appendUsd(linearTd, item.linear_vested);
+
+        tr.append(walletTd, nftTd, allocTd, claimedTd, lockedTd, linearTd);
         return tr;
     }
 
@@ -417,19 +507,21 @@
 
     // ── Init ─────────────────────────────────────────────
     if (typeof SONAR_OVERVIEW !== 'undefined') {
-        renderKPIs();
-        renderDistLegend();
+        fetchInxPrice().then(() => {
+            renderKPIs();
+            renderDistLegend();
 
-        walletState = makeTableState(SONAR_WALLETS, 'walletTableBody', 'walletLoadingIndicator', 'walletCountBadge');
-        patronState = makeTableState(PATRON_VESTING, 'patronTableBody', 'patronLoadingIndicator', 'patronCountBadge');
+            walletState = makeTableState(SONAR_WALLETS, 'walletTableBody', 'walletLoadingIndicator', 'walletCountBadge');
+            patronState = makeTableState(PATRON_VESTING, 'patronTableBody', 'patronLoadingIndicator', 'patronCountBadge');
 
-        loadMore(walletState, createWalletRow);
-        loadMore(patronState, createPatronRow);
+            loadMore(walletState, createWalletRow);
+            loadMore(patronState, createPatronRow);
 
-        attachScroll('walletTableContainer', walletState, createWalletRow);
-        attachScroll('patronTableContainer', patronState, createPatronRow);
+            attachScroll('walletTableContainer', walletState, createWalletRow);
+            attachScroll('patronTableContainer', patronState, createPatronRow);
 
-        updateLoader();
+            updateLoader();
+        });
     }
     </script>
 
