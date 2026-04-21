@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>INX Whale Tracker — Infinex</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sonar.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .whale-addr {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: 0.2px;
+        }
+        .whale-addr:hover { color: var(--accent-color); }
+
+        .val-net-pos {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: #4ade80;
+            font-weight: 600;
+        }
+        .val-net-neg {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: #f87171;
+            font-weight: 600;
+        }
+        .whale-ts {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-tertiary);
+            white-space: nowrap;
+        }
+        .tx-hash {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            letter-spacing: 0.2px;
+        }
+        .tx-hash:hover { color: var(--accent-color); }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loader -->
+    <div class="loader-screen" id="loaderScreen">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
+                <div class="loader-glow"></div>
+            </div>
+            <div class="loader-bar">
+                <div class="loader-progress" id="loaderProgress"></div>
+            </div>
+            <p class="loader-text">Loading Whale Tracker...</p>
+        </div>
+    </div>
+
+    <!-- Page Nav -->
+    <nav class="page-nav">
+        <a href="index.html" class="nav-link">Leaderboard</a>
+        <a href="sonar.html" class="nav-link">Sonar Analytics</a>
+        <a href="whales.html" class="nav-link active">Whale Tracker</a>
+    </nav>
+
+    <div class="container sonar-container">
+
+        <!-- Header -->
+        <header class="sonar-header">
+            <div class="logo-wrapper">
+                <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
+                <div class="logo-glow"></div>
+            </div>
+            <h1>INX Whale Tracker</h1>
+            <p class="subtitle">Large transfers &amp; wallet accumulation — Etherscan on-chain data</p>
+            <div class="last-updated" id="lastUpdatedBadge">
+                <span class="last-updated-dot"></span>
+                <span id="lastUpdatedText">Loading...</span>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <section class="section">
+            <div class="bento-grid">
+
+                <div class="kpi-card">
+                    <span class="kpi-label">Transfers Scanned</span>
+                    <span class="kpi-value" id="kpiScanned">—</span>
+                    <span class="kpi-sub">Last <span class="hl" id="kpiScannedSub">—</span> INX transfers</span>
+                </div>
+
+                <div class="kpi-card">
+                    <span class="kpi-label">Whale Threshold</span>
+                    <span class="kpi-value is-accent" id="kpiThreshold">—</span>
+                    <span class="kpi-sub">Min INX per transfer to qualify</span>
+                </div>
+
+                <div class="kpi-card">
+                    <span class="kpi-label">Whale Transfers Found</span>
+                    <span class="kpi-value" id="kpiCount">—</span>
+                    <span class="kpi-sub">Transfers above whale threshold</span>
+                </div>
+
+                <div class="kpi-card span-2">
+                    <span class="kpi-label">Total Whale Volume</span>
+                    <span class="kpi-value is-lg" id="kpiVolume">—</span>
+                    <span class="kpi-sub">Combined INX across all whale moves</span>
+                </div>
+
+                <div class="kpi-card">
+                    <span class="kpi-label">Biggest Single Move</span>
+                    <span class="kpi-value is-accent" id="kpiBiggest">—</span>
+                    <span class="kpi-sub">Largest single whale transfer</span>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Large Transfers Table -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-eyebrow">On-chain Activity</span>
+                <h2 class="section-title">Large Transfers</h2>
+            </div>
+            <div class="table-section-meta">
+                <span class="table-count-badge" id="transfersBadge">loading…</span>
+            </div>
+            <div class="table-container" id="transfersContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Amount (INX)</th>
+                            <th>Tx</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transfersBody"></tbody>
+                </table>
+                <div class="loading-indicator" id="transfersLoader">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Top Accumulators Table -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-eyebrow">Wallet Activity</span>
+                <h2 class="section-title">Top Accumulators</h2>
+            </div>
+            <div class="table-section-meta">
+                <span class="table-count-badge" id="accumBadge">loading…</span>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Wallet</th>
+                            <th>Net INX</th>
+                            <th>Received</th>
+                            <th>Sent</th>
+                            <th>Txs</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accumBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <a href="https://infinex.xyz" target="_blank" rel="noopener">infinex.xyz</a>
+        <span class="separator">•</span>
+        <a href="https://x.com/infinex" target="_blank" rel="noopener">@infinex</a>
+        <span class="separator">•</span>
+        <a href="https://x.com/0xAirr" target="_blank" rel="noopener">@0xAirr</a>
+        <a href="https://x.com/MazinoTower" target="_blank" rel="noopener">@MazinoTower</a>
+    </footer>
+
+    <script src="whale-data.js"></script>
+
+    <script>
+        // ── Loader ───────────────────────────────────────────────
+        const loaderScreen   = document.getElementById('loaderScreen');
+        const loaderProgress = document.getElementById('loaderProgress');
+        let progress = 0;
+
+        function updateLoader() {
+            progress += Math.random() * 15 + 5;
+            if (progress > 100) progress = 100;
+            loaderProgress.style.width = progress + '%';
+            if (progress < 100) {
+                setTimeout(updateLoader, 150);
+            } else {
+                setTimeout(() => {
+                    loaderScreen.classList.add('fade-out');
+                    setTimeout(() => { loaderScreen.style.display = 'none'; }, 500);
+                }, 300);
+            }
+        }
+
+        // ── Utilities ─────────────────────────────────────────────
+        function fmt(n) { return Number(n).toLocaleString(); }
+
+        function shortAddr(addr) {
+            return addr.slice(0, 6) + '…' + addr.slice(-4);
+        }
+
+        function addrLink(addr) {
+            const a = document.createElement('a');
+            a.href = `https://etherscan.io/address/${addr}`;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.className = 'whale-addr';
+            a.textContent = shortAddr(addr);
+            return a;
+        }
+
+        function timeAgo(ts) {
+            const diff = Math.floor(Date.now() / 1000) - ts;
+            if (diff < 60)   return diff + 's ago';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            return Math.floor(diff / 86400) + 'd ago';
+        }
+
+        // ── KPI Cards ─────────────────────────────────────────────
+        function populateKPIs() {
+            document.getElementById('lastUpdatedText').textContent =
+                'Updated ' + WHALE_LAST_UPDATED;
+            document.getElementById('kpiScanned').textContent =
+                fmt(WHALE_TRANSFERS_SCANNED);
+            document.getElementById('kpiScannedSub').textContent =
+                fmt(WHALE_TRANSFERS_SCANNED);
+            document.getElementById('kpiThreshold').textContent =
+                fmt(WHALE_THRESHOLD) + ' INX';
+            document.getElementById('kpiCount').textContent =
+                fmt(WHALE_TRANSFERS.length);
+            document.getElementById('kpiVolume').textContent =
+                fmt(WHALE_TOTAL_VOLUME) + ' INX';
+            document.getElementById('kpiBiggest').textContent =
+                fmt(WHALE_BIGGEST_SINGLE) + ' INX';
+        }
+
+        // ── Large Transfers Table (infinite scroll) ───────────────
+        const BATCH = 50;
+        let txDisplayed = 0;
+        let txLoading   = false;
+
+        function createTxRow(tx) {
+            const tr = document.createElement('tr');
+            const tsCell = document.createElement('td');
+            tsCell.innerHTML = `<span class="whale-ts">${timeAgo(tx.ts)}</span>`;
+
+            const fromCell = document.createElement('td');
+            fromCell.appendChild(addrLink(tx.from));
+
+            const toCell = document.createElement('td');
+            toCell.appendChild(addrLink(tx.to));
+
+            const amtCell = document.createElement('td');
+            amtCell.innerHTML = `<span class="val-inx">${fmt(tx.amount)}</span>`;
+
+            const hashCell = document.createElement('td');
+            const hashA = document.createElement('a');
+            hashA.href = `https://etherscan.io/tx/${tx.hash}`;
+            hashA.target = '_blank';
+            hashA.rel = 'noopener';
+            hashA.className = 'tx-hash';
+            hashA.textContent = tx.hash.slice(0, 8) + '…';
+            hashCell.appendChild(hashA);
+
+            tr.append(tsCell, fromCell, toCell, amtCell, hashCell);
+            return tr;
+        }
+
+        function loadMoreTxs() {
+            if (txLoading || txDisplayed >= WHALE_TRANSFERS.length) return;
+            txLoading = true;
+            const loader = document.getElementById('transfersLoader');
+            loader.style.display = 'flex';
+
+            setTimeout(() => {
+                const frag = document.createDocumentFragment();
+                const end  = Math.min(txDisplayed + BATCH, WHALE_TRANSFERS.length);
+                for (let i = txDisplayed; i < end; i++) {
+                    frag.appendChild(createTxRow(WHALE_TRANSFERS[i]));
+                }
+                document.getElementById('transfersBody').appendChild(frag);
+                txDisplayed = end;
+                txLoading = false;
+                loader.style.display = txDisplayed >= WHALE_TRANSFERS.length ? 'none' : 'flex';
+                document.getElementById('transfersBadge').textContent =
+                    `${fmt(txDisplayed)} / ${fmt(WHALE_TRANSFERS.length)} transfers`;
+            }, 80);
+        }
+
+        document.getElementById('transfersContainer').addEventListener('scroll', e => {
+            const el = e.currentTarget;
+            if (el.scrollTop + el.clientHeight >= el.scrollHeight - 200) {
+                loadMoreTxs();
+            }
+        });
+
+        // ── Top Accumulators Table ────────────────────────────────
+        function populateAccumulators() {
+            const tbody = document.getElementById('accumBody');
+            const frag  = document.createDocumentFragment();
+            for (const w of WHALE_ACCUMULATORS) {
+                const tr = document.createElement('tr');
+
+                const walletCell = document.createElement('td');
+                walletCell.appendChild(addrLink(w.wallet));
+
+                const netCell = document.createElement('td');
+                netCell.innerHTML = `<span class="${w.net >= 0 ? 'val-net-pos' : 'val-net-neg'}">${w.net >= 0 ? '+' : ''}${fmt(w.net)}</span>`;
+
+                const rcvCell = document.createElement('td');
+                rcvCell.innerHTML = `<span class="val-inx">${fmt(w.received)}</span>`;
+
+                const sentCell = document.createElement('td');
+                sentCell.innerHTML = `<span class="val-neutral">${fmt(w.sent)}</span>`;
+
+                const txsCell = document.createElement('td');
+                txsCell.innerHTML = `<span class="val-neutral">${w.txs}</span>`;
+
+                tr.append(walletCell, netCell, rcvCell, sentCell, txsCell);
+                frag.appendChild(tr);
+            }
+            tbody.appendChild(frag);
+            document.getElementById('accumBadge').textContent =
+                `Top ${WHALE_ACCUMULATORS.length} wallets by net INX`;
+        }
+
+        // ── Init ──────────────────────────────────────────────────
+        if (typeof WHALE_TRANSFERS !== 'undefined') {
+            updateLoader();
+            populateKPIs();
+            loadMoreTxs();
+            populateAccumulators();
+        }
+    </script>
+
+</body>
+</html>
