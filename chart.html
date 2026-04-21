@@ -9,80 +9,69 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.1.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        .timeframe-bar {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .tf-btn {
-            padding: 8px 20px;
-            border-radius: 100px;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(12px);
-            font-size: 13px;
-            font-weight: 600;
-            font-family: var(--font-main);
-            letter-spacing: 0.3px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .tf-btn:hover {
-            border-color: rgba(247, 107, 28, 0.45);
-            color: var(--accent-color);
-        }
-        .tf-btn.active {
-            border-color: var(--accent-color);
-            color: var(--accent-color);
-            background: rgba(247, 107, 28, 0.07);
-            box-shadow: 0 0 18px rgba(247, 107, 28, 0.18);
-        }
-        #chart-container {
-            height: 520px;
+        .chart-wrapper {
             border-radius: 20px;
             overflow: hidden;
-            background: var(--card-bg);
             border: 1px solid var(--border-color);
             box-shadow: var(--card-shadow);
-            backdrop-filter: blur(20px);
+            background: #0a0a0a;
+            height: 560px;
         }
-        #chart-error {
-            display: none;
-            text-align: center;
-            padding: 80px 20px;
-            color: var(--text-secondary);
-            font-size: 15px;
-        }
-        .chart-legend {
-            display: flex;
-            gap: 20px;
-            margin-top: 12px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            font-family: var(--font-mono);
-        }
-        .legend-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 5px;
-            vertical-align: middle;
+        .chart-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
         }
         @media (max-width: 768px) {
-            #chart-container { height: 380px; }
+            .chart-wrapper { height: 420px; }
         }
+
+        .whale-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 340px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .whale-feed::-webkit-scrollbar { width: 4px; }
+        .whale-feed::-webkit-scrollbar-track { background: transparent; }
+        .whale-feed::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+        .wf-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+        .wf-badge {
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            flex-shrink: 0;
+            min-width: 54px;
+            text-align: center;
+        }
+        .wf-badge.buy  { background: rgba(247,107,28,0.12); color: #F76B1C; border: 1px solid rgba(247,107,28,0.3); }
+        .wf-badge.sell { background: rgba(136,136,136,0.10); color: #aaa;   border: 1px solid rgba(136,136,136,0.25); }
+        .wf-amount { color: var(--text-primary); font-weight: 700; flex: 1; }
+        .wf-label  { color: var(--accent-color); }
+        .wf-addr   { color: var(--text-tertiary); }
+        .wf-time   { color: var(--text-tertiary); flex-shrink: 0; }
     </style>
 </head>
 
 <body>
 
-    <!-- Loader -->
     <div class="loader-screen" id="loaderScreen">
         <div class="loader-content">
             <div class="loader-logo">
@@ -96,7 +85,6 @@
         </div>
     </div>
 
-    <!-- Page Nav -->
     <nav class="page-nav">
         <a href="/" class="nav-link">Leaderboard</a>
         <a href="/sonar" class="nav-link">Sonar Analytics</a>
@@ -106,37 +94,38 @@
 
     <div class="container sonar-container">
 
-        <!-- Header -->
         <header class="sonar-header">
             <div class="logo-wrapper">
                 <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
                 <div class="logo-glow"></div>
             </div>
             <h1>INX Price Chart</h1>
-            <p class="subtitle">INX/USD · GeckoTerminal · TradingView Lightweight Charts</p>
+            <p class="subtitle">INX/USD · Uniswap V4 · GeckoTerminal</p>
             <div class="last-updated" id="priceBadge">
                 <span class="last-updated-dot"></span>
                 <span id="priceText">Loading...</span>
             </div>
         </header>
 
-        <!-- Chart Section -->
         <section class="section">
-            <div class="timeframe-bar">
-                <button class="tf-btn" data-days="1">1D</button>
-                <button class="tf-btn active" data-days="7">7D</button>
-                <button class="tf-btn" data-days="30">30D</button>
-                <button class="tf-btn" data-days="90">90D</button>
-            </div>
-            <div id="chart-container"></div>
-            <div id="chart-error">Failed to load chart data. Please try again later.</div>
-            <div class="chart-legend" id="whaleLegend" style="display:none">
-                <span><span class="legend-dot" style="background:#F76B1C"></span>Whale Buy</span>
-                <span><span class="legend-dot" style="background:#888888"></span>Whale Sell</span>
+            <div class="chart-wrapper">
+                <iframe
+                    src="https://www.geckoterminal.com/eth/pools/0xdb66b18431f00e001867c67c6022c36205abec136381cd0d3fa58068ec88ace6?embed=1&info=0&swaps=1&grayscale=0&light_chart=0"
+                    title="INX/USDC price chart"
+                    allowfullscreen>
+                </iframe>
             </div>
         </section>
 
-    </div><!-- /.container -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-eyebrow">On-chain Activity</span>
+                <h2 class="section-title">Whale Buy / Sell</h2>
+            </div>
+            <div class="whale-feed" id="whaleFeed"></div>
+        </section>
+
+    </div>
 
     <footer>
         <a href="https://infinex.xyz" target="_blank" rel="noopener">infinex.xyz</a>
@@ -168,119 +157,10 @@
         }
     }
 
-    // ── Chart setup ──────────────────────────────────────
-    const container = document.getElementById('chart-container');
-    const errorEl   = document.getElementById('chart-error');
-    const legendEl  = document.getElementById('whaleLegend');
-
-    const chart = LightweightCharts.createChart(container, {
-        width:  container.clientWidth,
-        height: container.clientHeight,
-        layout: {
-            background: { type: 'solid', color: '#000000' },
-            textColor: '#888888',
-            fontFamily: "'JetBrains Mono', monospace",
-        },
-        grid: {
-            vertLines: { color: '#1a1a1a' },
-            horzLines: { color: '#1a1a1a' },
-        },
-        crosshair: {
-            mode: LightweightCharts.CrosshairMode.Magnet,
-            vertLine: { color: 'rgba(247,107,28,0.5)', labelBackgroundColor: '#F76B1C' },
-            horzLine: { color: 'rgba(247,107,28,0.5)', labelBackgroundColor: '#F76B1C' },
-        },
-        rightPriceScale: { borderColor: '#1a1a1a' },
-        timeScale: { borderColor: '#1a1a1a', timeVisible: true, secondsVisible: false },
-        handleScroll: true,
-        handleScale: true,
-    });
-
-    const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
-        upColor:       '#F76B1C',
-        downColor:     '#555555',
-        borderVisible: false,
-        wickUpColor:   '#F76B1C',
-        wickDownColor: '#555555',
-    });
-
-    candleSeries.priceScale().applyOptions({ scaleMargins: { top: 0.05, bottom: 0.05 } });
-
-    window.addEventListener('resize', () => {
-        chart.applyOptions({ width: container.clientWidth });
-    });
-
-    // ── Whale markers ────────────────────────────────────
-    function buildWhaleMarkers(chartData) {
-        if (typeof WHALE_TRANSFERS === 'undefined' || !chartData.length) return [];
-
-        const chartStart = chartData[0].time;
-        const chartEnd   = chartData[chartData.length - 1].time;
-
-        // Deduplicate: one marker per tx hash per type to avoid stacking
-        const seen = new Set();
-        const markers = [];
-
-        for (const tx of WHALE_TRANSFERS) {
-            if (tx.type !== 'buy' && tx.type !== 'sell') continue;
-            if (tx.ts < chartStart || tx.ts > chartEnd) continue;
-            const key = tx.hash + tx.type;
-            if (seen.has(key)) continue;
-            seen.add(key);
-
-            // Snap to nearest candle timestamp
-            const time = chartData.reduce((best, c) =>
-                Math.abs(c.time - tx.ts) < Math.abs(best.time - tx.ts) ? c : best
-            ).time;
-
-            markers.push({
-                time,
-                position: tx.type === 'buy' ? 'belowBar' : 'aboveBar',
-                color:    tx.type === 'buy' ? '#F76B1C' : '#888888',
-                shape:    tx.type === 'buy' ? 'arrowUp'  : 'arrowDown',
-                text: (tx.amount >= 1e6
-                    ? (tx.amount / 1e6).toFixed(1) + 'M'
-                    : tx.amount >= 1e3
-                    ? Math.round(tx.amount / 1e3) + 'K'
-                    : tx.amount) + ' INX',
-            });
-        }
-
-        return markers.sort((a, b) => a.time - b.time);
-    }
-
-    // ── Data loading ─────────────────────────────────────
-    async function loadChart(days) {
-        try {
-            const res = await fetch(`/api/inx-chart?days=${days}`);
-            const { data } = await res.json();
-            if (!data || data.length === 0) throw new Error('empty');
-
-            candleSeries.setData(data);
-
-            const markers = buildWhaleMarkers(data);
-            if (markers.length) {
-                candleSeries.setMarkers(markers);
-                legendEl.style.display = 'flex';
-            } else {
-                candleSeries.setMarkers([]);
-                legendEl.style.display = 'none';
-            }
-
-            chart.timeScale().fitContent();
-            container.style.display = '';
-            errorEl.style.display   = 'none';
-        } catch {
-            container.style.display = 'none';
-            errorEl.style.display   = 'block';
-            legendEl.style.display  = 'none';
-        }
-    }
-
     // ── Price badge ──────────────────────────────────────
     async function fetchPrice() {
         try {
-            const res = await fetch('/api/inx-price');
+            const res   = await fetch('/api/inx-price');
             const { price } = await res.json();
             if (price != null) {
                 document.getElementById('priceText').textContent =
@@ -289,17 +169,85 @@
         } catch { /* leave as Loading... */ }
     }
 
-    // ── Timeframe buttons ────────────────────────────────
-    document.querySelectorAll('.tf-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            loadChart(btn.dataset.days);
-        });
-    });
+    // ── Whale feed ───────────────────────────────────────
+    function fmtAmt(n) {
+        if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M INX';
+        if (n >= 1e3) return Math.round(n / 1e3) + 'K INX';
+        return n.toLocaleString() + ' INX';
+    }
+
+    function fmtTime(ts) {
+        return new Date(ts * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function shortAddr(addr) {
+        return addr.slice(0, 6) + '…' + addr.slice(-4);
+    }
+
+    function makeEmptyRow(msg) {
+        const div = document.createElement('div');
+        div.style.cssText = 'color:var(--text-tertiary);font-size:13px;padding:20px;text-align:center';
+        div.textContent = msg;
+        return div;
+    }
+
+    function makeWhaleRow(tx) {
+        const isBuy = tx.type === 'buy';
+
+        const row = document.createElement('div');
+        row.className = 'wf-row';
+
+        const badge = document.createElement('span');
+        badge.className = 'wf-badge ' + tx.type;
+        badge.textContent = tx.type.toUpperCase();
+        row.appendChild(badge);
+
+        const amt = document.createElement('span');
+        amt.className = 'wf-amount';
+        amt.textContent = fmtAmt(tx.amount);
+        row.appendChild(amt);
+
+        const addrKey  = isBuy ? tx.to : tx.from;
+        const label    = (typeof WHALE_LABELS !== 'undefined') ? WHALE_LABELS[addrKey] : null;
+        const addrSpan = document.createElement('span');
+        addrSpan.className = label ? 'wf-label' : 'wf-addr';
+        addrSpan.textContent = label || shortAddr(addrKey);
+        row.appendChild(addrSpan);
+
+        const time = document.createElement('span');
+        time.className = 'wf-time';
+        time.textContent = fmtTime(tx.ts);
+        row.appendChild(time);
+
+        return row;
+    }
+
+    function renderWhaleFeed() {
+        const feed = document.getElementById('whaleFeed');
+        feed.textContent = '';
+
+        if (typeof WHALE_TRANSFERS === 'undefined') {
+            feed.appendChild(makeEmptyRow('No data available.'));
+            return;
+        }
+
+        const txs = WHALE_TRANSFERS
+            .filter(tx => tx.type === 'buy' || tx.type === 'sell')
+            .sort((a, b) => b.ts - a.ts);
+
+        if (!txs.length) {
+            feed.appendChild(makeEmptyRow('No whale buys or sells in the last 24h.'));
+            return;
+        }
+
+        const frag = document.createDocumentFragment();
+        txs.forEach(tx => frag.appendChild(makeWhaleRow(tx)));
+        feed.appendChild(frag);
+    }
 
     // ── Init ─────────────────────────────────────────────
-    Promise.all([loadChart(7), fetchPrice()]).then(() => updateLoader());
+    fetchPrice().then(() => updateLoader());
+    renderWhaleFeed();
     </script>
 
 </body>

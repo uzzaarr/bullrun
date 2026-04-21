@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         const timeframe = days <= 7 ? 'hour' : 'day';
         const limit     = days === 1 ? 24 : days === 7 ? 168 : days;
         const ohlcRes   = await fetch(
-            `https://api.geckoterminal.com/api/v2/networks/eth/pools/${poolAddr}/ohlcv/${timeframe}?aggregate=1&limit=${limit}&currency=usd`,
+            `https://api.geckoterminal.com/api/v2/networks/eth/pools/${poolAddr}/ohlcv/${timeframe}?aggregate=1&limit=${limit}&currency=usd&token=quote`,
             { headers: HEADERS }
         );
         if (!ohlcRes.ok) throw new Error(`ohlcv ${ohlcRes.status}`);
