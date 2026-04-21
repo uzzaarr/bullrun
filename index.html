@@ -187,12 +187,20 @@
 
         function searchUser() {
             if (typeof LEADERBOARD === 'undefined') return;
-            
-            let value = document.getElementById("searchInput").value.toLowerCase();
-            let filtered = LEADERBOARD.filter(item =>
+            const value = document.getElementById("searchInput").value.toLowerCase();
+            const filtered = LEADERBOARD.filter(item =>
                 item.username.toLowerCase().includes(value)
             );
-            loadTable(filtered);
+            const frag = document.createDocumentFragment();
+            const end  = Math.min(BATCH_SIZE, filtered.length);
+            for (let i = 0; i < end; i++) frag.appendChild(createRow(filtered[i]));
+            tbody.innerHTML = '';
+            tbody.appendChild(frag);
+            currentData = filtered;
+            displayedRows = end;
+            isLoading = false;
+            updateStats(filtered.length, end);
+            loadingIndicator.style.display = end >= filtered.length ? 'none' : 'flex';
         }
     </script>
 

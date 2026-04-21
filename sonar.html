@@ -342,12 +342,19 @@
     }
 
     function resetTable(state, filtered, createRowFn) {
-        state.tbody.innerHTML = '';
         state.current   = filtered;
         state.displayed = 0;
         state.loading   = false;
+        const frag = document.createDocumentFragment();
+        const end  = Math.min(BATCH, filtered.length);
+        for (let i = 0; i < end; i++) {
+            frag.appendChild(createRowFn(filtered[i]));
+        }
+        state.tbody.innerHTML = '';
+        state.tbody.appendChild(frag);
+        state.displayed = end;
+        state.indicator.style.display = end >= filtered.length ? 'none' : 'flex';
         updateBadge(state);
-        loadMore(state, createRowFn);
     }
 
     function updateBadge(state) {
