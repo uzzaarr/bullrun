@@ -58,6 +58,22 @@
             color: var(--text-secondary);
             font-size: 15px;
         }
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+        .legend-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
         @media (max-width: 768px) {
             #chart-container { height: 380px; }
         }
@@ -97,7 +113,7 @@
                 <div class="logo-glow"></div>
             </div>
             <h1>INX Price Chart</h1>
-            <p class="subtitle">INX/USD · CoinGecko · TradingView Lightweight Charts</p>
+            <p class="subtitle">INX/USD · GeckoTerminal · TradingView Lightweight Charts</p>
             <div class="last-updated" id="priceBadge">
                 <span class="last-updated-dot"></span>
                 <span id="priceText">Loading...</span>
@@ -114,6 +130,10 @@
             </div>
             <div id="chart-container"></div>
             <div id="chart-error">Failed to load chart data. Please try again later.</div>
+            <div class="chart-legend" id="whaleLegend" style="display:none">
+                <span><span class="legend-dot" style="background:#F76B1C"></span>Whale Buy</span>
+                <span><span class="legend-dot" style="background:#888888"></span>Whale Sell</span>
+            </div>
         </section>
 
     </div><!-- /.container -->
@@ -127,6 +147,7 @@
         <a href="https://x.com/MazinoTower" target="_blank" rel="noopener">@MazinoTower</a>
     </footer>
 
+    <script src="whale-data.js"></script>
     <script>
     // ── Loader ───────────────────────────────────────────
     const loaderScreen   = document.getElementById('loaderScreen');
@@ -150,6 +171,7 @@
     // ── Chart setup ──────────────────────────────────────
     const container = document.getElementById('chart-container');
     const errorEl   = document.getElementById('chart-error');
+    const legendEl  = document.getElementById('whaleLegend');
 
     const chart = LightweightCharts.createChart(container, {
         width:  container.clientWidth,
@@ -175,8 +197,8 @@
     });
 
     const candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
-        upColor:      '#F76B1C',
-        downColor:    '#555555',
+        upColor:       '#F76B1C',
+        downColor:     '#555555',
         borderVisible: false,
         wickUpColor:   '#F76B1C',
         wickDownColor: '#555555',
@@ -188,19 +210,70 @@
         chart.applyOptions({ width: container.clientWidth });
     });
 
+    // ── Whale markers ────────────────────────────────────
+    function buildWhaleMarkers(chartData) {
+        if (typeof WHALE_TRANSFERS === 'undefined' || !chartData.length) return [];
+
+        const chartStart = chartData[0].time;
+        const chartEnd   = chartData[chartData.length - 1].time;
+
+        // Deduplicate: one marker per tx hash per type to avoid stacking
+        const seen = new Set();
+        const markers = [];
+
+        for (const tx of WHALE_TRANSFERS) {
+            if (tx.type !== 'buy' && tx.type !== 'sell') continue;
+            if (tx.ts < chartStart || tx.ts > chartEnd) continue;
+            const key = tx.hash + tx.type;
+            if (seen.has(key)) continue;
+            seen.add(key);
+
+            // Snap to nearest candle timestamp
+            const time = chartData.reduce((best, c) =>
+                Math.abs(c.time - tx.ts) < Math.abs(best.time - tx.ts) ? c : best
+            ).time;
+
+            markers.push({
+                time,
+                position: tx.type === 'buy' ? 'belowBar' : 'aboveBar',
+                color:    tx.type === 'buy' ? '#F76B1C' : '#888888',
+                shape:    tx.type === 'buy' ? 'arrowUp'  : 'arrowDown',
+                text: (tx.amount >= 1e6
+                    ? (tx.amount / 1e6).toFixed(1) + 'M'
+                    : tx.amount >= 1e3
+                    ? Math.round(tx.amount / 1e3) + 'K'
+                    : tx.amount) + ' INX',
+            });
+        }
+
+        return markers.sort((a, b) => a.time - b.time);
+    }
+
     // ── Data loading ─────────────────────────────────────
     async function loadChart(days) {
         try {
-            const res  = await fetch(`/api/inx-chart?days=${days}`);
+            const res = await fetch(`/api/inx-chart?days=${days}`);
             const { data } = await res.json();
             if (!data || data.length === 0) throw new Error('empty');
+
             candleSeries.setData(data);
+
+            const markers = buildWhaleMarkers(data);
+            if (markers.length) {
+                candleSeries.setMarkers(markers);
+                legendEl.style.display = 'flex';
+            } else {
+                candleSeries.setMarkers([]);
+                legendEl.style.display = 'none';
+            }
+
             chart.timeScale().fitContent();
             container.style.display = '';
             errorEl.style.display   = 'none';
         } catch {
             container.style.display = 'none';
             errorEl.style.display   = 'block';
+            legendEl.style.display  = 'none';
         }
     }
 
