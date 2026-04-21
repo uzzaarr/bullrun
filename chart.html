@@ -212,8 +212,7 @@
     const legendEl = document.getElementById('whaleLegend');
 
     const chart = LightweightCharts.createChart(document.getElementById('chart'), {
-        width:  wrap.clientWidth,
-        height: wrap.clientHeight,
+        autoSize: true,
         layout: {
             background: { type: 'solid', color: '#000' },
             textColor: '#666',
@@ -242,9 +241,6 @@
         wickDownColor: '#555',
     });
 
-    window.addEventListener('resize', () => {
-        chart.applyOptions({ width: wrap.clientWidth, height: wrap.clientHeight });
-    });
 
     // ── Whale marker map ─────────────────────────────────
     // Maps snapped-candle-time → array of whale txs
