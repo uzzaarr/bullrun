@@ -182,12 +182,12 @@
             <div class="table-container" id="transfersContainer">
                 <table>
                     <thead>
-                        <tr>
-                            <th>Time</th>
+                        <tr id="transfers-head">
+                            <th class="sortable" data-col="ts" onclick="sortTransfers('ts')">Time <span class="sort-arrow"></span></th>
                             <th>Type</th>
                             <th>From</th>
                             <th>To</th>
-                            <th>Amount (INX)</th>
+                            <th class="sortable" data-col="amount" onclick="sortTransfers('amount')">Amount (INX) <span class="sort-arrow"></span></th>
                             <th>Tx</th>
                         </tr>
                     </thead>
@@ -221,11 +221,11 @@
             <div class="table-container">
                 <table>
                     <thead>
-                        <tr>
+                        <tr id="accum-head">
                             <th>Wallet</th>
-                            <th>Net INX</th>
-                            <th>Received</th>
-                            <th>Sent</th>
+                            <th class="sortable" data-col="net" onclick="sortAccum('net')">Net INX <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-col="received" onclick="sortAccum('received')">Received <span class="sort-arrow"></span></th>
+                            <th class="sortable" data-col="sent" onclick="sortAccum('sent')">Sent <span class="sort-arrow"></span></th>
                             <th>Txs</th>
                         </tr>
                     </thead>
@@ -356,6 +356,20 @@
                 fmt(WHALE_BIGGEST_SINGLE) + ' INX';
         }
 
+        // ── Sort helpers ──────────────────────────────────────────
+        let txCurrent  = [];
+        let txSort     = { col: 'ts', dir: 1 };
+        let accumCurrent = [];
+        let accumSort  = { col: 'net', dir: 1 };
+
+        function updateSortArrows(rowId, sortState) {
+            const row = document.getElementById(rowId);
+            if (!row) return;
+            row.querySelectorAll('.sort-arrow').forEach(el => { el.textContent = ''; });
+            const active = row.querySelector('[data-col="' + sortState.col + '"] .sort-arrow');
+            if (active) active.textContent = sortState.dir === 1 ? ' ↓' : ' ↑';
+        }
+
         // ── Transfers table ───────────────────────────────────────
 
         function createTxRow(tx) {
@@ -399,13 +413,22 @@
         }
 
         function renderTransfers(data) {
+            txCurrent = data;
+            const sorted = [...data].sort((a, b) => txSort.dir * (b[txSort.col] - a[txSort.col]));
             const frag = document.createDocumentFragment();
-            for (const tx of data) frag.appendChild(createTxRow(tx));
+            for (const tx of sorted) frag.appendChild(createTxRow(tx));
             const body = document.getElementById('transfersBody');
             body.textContent = '';
             body.appendChild(frag);
             document.getElementById('transfersLoader').style.display = 'none';
             document.getElementById('transfersBadge').textContent = fmt(data.length) + ' transfers';
+            updateSortArrows('transfers-head', txSort);
+        }
+
+        function sortTransfers(col) {
+            if (txSort.col === col) txSort.dir *= -1;
+            else { txSort.col = col; txSort.dir = 1; }
+            renderTransfers(txCurrent);
         }
 
         function searchTransfers() {
@@ -473,13 +496,21 @@
         }
 
         function renderAccumulators(data) {
+            accumCurrent = data;
+            const sorted = [...data].sort((a, b) => accumSort.dir * (b[accumSort.col] - a[accumSort.col]));
             const tbody = document.getElementById('accumBody');
             const frag  = document.createDocumentFragment();
-            for (const w of data) frag.appendChild(createAccumRow(w));
-            tbody.innerHTML = '';
+            for (const w of sorted) frag.appendChild(createAccumRow(w));
+            tbody.textContent = '';
             tbody.appendChild(frag);
-            document.getElementById('accumBadge').textContent =
-                `${data.length} wallets`;
+            document.getElementById('accumBadge').textContent = data.length + ' wallets';
+            updateSortArrows('accum-head', accumSort);
+        }
+
+        function sortAccum(col) {
+            if (accumSort.col === col) accumSort.dir *= -1;
+            else { accumSort.col = col; accumSort.dir = 1; }
+            renderAccumulators(accumCurrent);
         }
 
         function searchAccumulators() {

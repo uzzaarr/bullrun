@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="trades-history.js"></script>
     <script>if(sessionStorage.getItem('site_visited'))document.documentElement.classList.add('no-loader');sessionStorage.setItem('site_visited','1');</script>
     <style>
         /* ── Wide container for two-column layout ── */
@@ -180,8 +181,9 @@
             letter-spacing: 0.5px;
             flex-shrink: 0;
         }
-        .popup-badge.buy  { background: rgba(247,107,28,0.15); color: #F76B1C; }
-        .popup-badge.sell { background: rgba(136,136,136,0.12); color: #aaa; }
+        .popup-badge.buy      { background: rgba(247,107,28,0.15); color: #F76B1C; }
+        .popup-badge.sell     { background: rgba(136,136,136,0.12); color: #aaa; }
+        .popup-badge.transfer { background: rgba(255,255,255,0.04); color: #555; }
         .popup-amt  { color: #fff; flex: 1; font-weight: 700; }
         .popup-link {
             color: var(--text-tertiary);
@@ -422,8 +424,9 @@
         .type-dot {
             width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
         }
-        .type-dot.buy  { background: #F76B1C; box-shadow: 0 0 7px rgba(247,107,28,0.8); }
-        .type-dot.sell { background: #555;    box-shadow: 0 0 7px rgba(85,85,85,0.6); }
+        .type-dot.buy      { background: #F76B1C; box-shadow: 0 0 7px rgba(247,107,28,0.8); }
+        .type-dot.sell     { background: #555;    box-shadow: 0 0 7px rgba(85,85,85,0.6); }
+        .type-dot.transfer { background: #3a3a3a; box-shadow: none; }
         .type-label {
             font-family: var(--font-mono);
             font-size: 10px;
@@ -431,8 +434,9 @@
             letter-spacing: 1.5px;
             text-transform: uppercase;
         }
-        .type-label.buy  { color: #F76B1C; }
-        .type-label.sell { color: #888; }
+        .type-label.buy      { color: #F76B1C; }
+        .type-label.sell     { color: #888; }
+        .type-label.transfer { color: #555; }
         .trade-time {
             font-family: var(--font-mono);
             font-size: 9px;
@@ -672,11 +676,8 @@
     </div>
 
     <script>
-    // ── Constants ────────────────────────────────────────
-    const INX_CA    = '0xdef1b2d939edc0e4d35806c59b3166f790175afe';
-    const MIN_WHALE = 100_000;
-
     // ── State ────────────────────────────────────────────
+    let inxPrice        = null;
     let currentCandles  = [];
     let allTrades       = [];
     let rangeFrom       = null;     // ms timestamp or null
@@ -745,17 +746,7 @@
         wickDownColor:    '#8888a0',
     });
 
-    // ── Trade helpers ────────────────────────────────────
-    function isBuy(t) {
-        return t.attributes.from_token_address.toLowerCase() !== INX_CA;
-    }
-
-    function inxAmt(t) {
-        return isBuy(t)
-            ? parseFloat(t.attributes.to_token_amount)
-            : parseFloat(t.attributes.from_token_amount);
-    }
-
+    // ── Format helpers ───────────────────────────────────
     function fmtINX(n) {
         if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
         if (n >= 1e3) return Math.round(n / 1e3) + 'K';
@@ -768,8 +759,8 @@
         return '$' + n.toFixed(2);
     }
 
-    function timeAgo(iso) {
-        const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    function timeAgo(ts) {  // ts is unix seconds
+        const diff = Math.floor(Date.now() / 1000) - ts;
         if (diff < 60)    return diff + 's ago';
         if (diff < 3600)  return Math.floor(diff / 60) + 'm ago';
         if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
@@ -791,9 +782,8 @@
         const start = currentCandles[0].time;
         const end   = currentCandles[currentCandles.length - 1].time;
         for (const t of allTrades) {
-            const ts = Math.floor(new Date(t.attributes.block_timestamp).getTime() / 1000);
-            if (ts < start || ts > end) continue;
-            const snapped = snapToCandle(ts);
+            if (t.ts < start || t.ts > end) continue;
+            const snapped = snapToCandle(t.ts);
             if (!markerMap.has(snapped)) markerMap.set(snapped, []);
             markerMap.get(snapped).push(t);
         }
@@ -838,9 +828,11 @@
     async function fetchPrice() {
         try {
             const { price } = await (await fetch('/api/inx-price')).json();
-            if (price != null)
+            if (price != null) {
+                inxPrice = price;
                 document.getElementById('priceText').textContent =
                     '$' + price.toFixed(price < 0.01 ? 6 : 4) + ' USD';
+            }
         } catch { /* ignore */ }
     }
 
@@ -854,17 +846,16 @@
     function showPopup(txs, x, y) {
         popup.textContent = '';
         for (const t of txs) {
-            const buy  = isBuy(t);
             const row  = makeEl('div', 'popup-row');
 
-            const badge = makeEl('span', 'popup-badge ' + (buy ? 'buy' : 'sell'));
-            badge.textContent = buy ? 'BUY' : 'SELL';
+            const badge = makeEl('span', 'popup-badge ' + t.type);
+            badge.textContent = t.type === 'buy' ? 'BUY' : t.type === 'sell' ? 'SELL' : 'TXN';
 
             const amt = makeEl('span', 'popup-amt');
-            amt.textContent = fmtINX(inxAmt(t)) + ' INX';
+            amt.textContent = fmtINX(t.inx) + ' INX';
 
             const link = makeEl('a', 'popup-link');
-            link.href   = 'https://etherscan.io/tx/' + encodeURIComponent(t.attributes.tx_hash);
+            link.href   = 'https://etherscan.io/tx/' + encodeURIComponent(t.hash);
             link.target = '_blank';
             link.rel    = 'noopener';
             link.textContent = 'TX ↗';
@@ -892,32 +883,29 @@
     function filteredTrades() {
         if (!rangeFrom && !rangeTo) return allTrades;
         return allTrades.filter(t => {
-            const ts = new Date(t.attributes.block_timestamp).getTime();
-            if (rangeFrom && ts < rangeFrom) return false;
-            if (rangeTo   && ts > rangeTo)   return false;
+            const ms = t.ts * 1000;
+            if (rangeFrom && ms < rangeFrom) return false;
+            if (rangeTo   && ms > rangeTo)   return false;
             return true;
         });
     }
 
     function createTradeCard(t) {
-        const buy  = isBuy(t);
-        const inx  = inxAmt(t);
-        const usd  = parseFloat(t.attributes.volume_in_usd);
-        const hash = t.attributes.tx_hash;
-        const ts   = t.attributes.block_timestamp;
+        const buy  = t.type === 'buy';
+        const usd  = inxPrice ? t.inx * inxPrice : 0;
 
         const card = makeEl('div', 'trade-card');
 
         // Top row
-        const top       = makeEl('div', 'trade-top');
-        const typeWrap  = makeEl('div', 'trade-type');
-        const dot       = makeEl('div', 'type-dot ' + (buy ? 'buy' : 'sell'));
-        const label     = makeEl('span', 'type-label ' + (buy ? 'buy' : 'sell'));
-        label.textContent = buy ? 'Buy' : 'Sell';
+        const top      = makeEl('div', 'trade-top');
+        const typeWrap = makeEl('div', 'trade-type');
+        const dot      = makeEl('div', 'type-dot ' + t.type);
+        const label    = makeEl('span', 'type-label ' + t.type);
+        label.textContent = t.type === 'buy' ? 'Buy' : t.type === 'sell' ? 'Sell' : 'Transfer';
         typeWrap.append(dot, label);
 
         const time = makeEl('span', 'trade-time');
-        time.textContent = timeAgo(ts);
+        time.textContent = timeAgo(t.ts);
 
         top.append(typeWrap, time);
 
@@ -925,23 +913,25 @@
         const bottom  = makeEl('div', 'trade-bottom');
         const amounts = makeEl('div', 'trade-amounts');
 
-        const inxRow  = makeEl('div', 'trade-inx');
-        inxRow.textContent = fmtINX(inx);
-        const unit    = makeEl('span', 'trade-inx-unit');
+        const inxRow = makeEl('div', 'trade-inx');
+        inxRow.textContent = fmtINX(t.inx);
+        const unit = makeEl('span', 'trade-inx-unit');
         unit.textContent = 'INX';
         inxRow.appendChild(unit);
+        amounts.appendChild(inxRow);
 
-        const usdRow  = makeEl('div', 'trade-usd');
-        usdRow.textContent = fmtUSD(usd);
+        if (usd > 0) {
+            const usdRow = makeEl('div', 'trade-usd');
+            usdRow.textContent = '≈' + fmtUSD(usd);
+            amounts.appendChild(usdRow);
+        }
 
-        amounts.append(inxRow, usdRow);
+        const txWrap = makeEl('div', 'trade-tx');
+        const hashEl = makeEl('span', 'tx-hash');
+        hashEl.textContent = t.hash.slice(0, 6) + '…' + t.hash.slice(-4);
 
-        const txWrap  = makeEl('div', 'trade-tx');
-        const hashEl  = makeEl('span', 'tx-hash');
-        hashEl.textContent = hash.slice(0, 6) + '…' + hash.slice(-4);
-
-        const txLink  = makeEl('a', 'tx-link');
-        txLink.href   = 'https://etherscan.io/tx/' + encodeURIComponent(hash);
+        const txLink = makeEl('a', 'tx-link');
+        txLink.href   = 'https://etherscan.io/tx/' + encodeURIComponent(t.hash);
         txLink.target = '_blank';
         txLink.rel    = 'noopener';
         txLink.title  = 'View on Etherscan';
@@ -952,10 +942,9 @@
         bottom.append(amounts, txWrap);
         card.append(top, bottom);
 
-        // Click → focus chart
+        // Click → focus chart on the matching candle
         card.addEventListener('click', () => {
-            const secs    = Math.floor(new Date(ts).getTime() / 1000);
-            const snapped = snapToCandle(secs);
+            const snapped = snapToCandle(t.ts);
             if (!snapped) return;
 
             if (activeFocusTime === snapped) {
@@ -973,9 +962,9 @@
             const focusMarker = {
                 time:     snapped,
                 position: buy ? 'belowBar' : 'aboveBar',
-                color:    buy ? '#F76B1C' : '#888',
+                color:    buy ? '#F76B1C' : t.type === 'sell' ? '#888' : '#444',
                 shape:    buy ? 'arrowUp' : 'arrowDown',
-                text:     buy ? 'B' : 'S',
+                text:     buy ? 'B' : t.type === 'sell' ? 'S' : 'T',
             };
             if (markersPlugin) {
                 markersPlugin.setMarkers([focusMarker]);
@@ -1002,7 +991,7 @@
             const icon  = makeEl('div', 'feed-empty-icon');
             icon.textContent = '~';
             const msg = makeEl('div');
-            msg.textContent = allTrades.length ? 'No trades in this window' : 'Scanning network…';
+            msg.textContent = allTrades.length ? 'No trades in this window' : 'No whale swaps found';
             empty.append(icon, msg);
             list.appendChild(empty);
             return;
@@ -1013,18 +1002,11 @@
         list.appendChild(frag);
     }
 
-    async function fetchTrades() {
-        try {
-            const res  = await fetch('/api/trades');
-            const json = await res.json();
-            if (!Array.isArray(json?.data)) return;
-            allTrades = json.data.filter(t => {
-                try { return inxAmt(t) >= MIN_WHALE; }
-                catch { return false; }
-            });
-            renderFeed();
-            buildMarkerMap();
-        } catch { /* keep stale data */ }
+    function loadHistoryTrades() {
+        if (typeof TRADES_HISTORY === 'undefined') return;
+        allTrades = TRADES_HISTORY;
+        renderFeed();
+        buildMarkerMap();
     }
 
     // ── Interval buttons ─────────────────────────────────
@@ -1199,10 +1181,10 @@
     Promise.all([
         loadChart('hour', '1'),
         fetchPrice(),
-        fetchTrades(),
-    ]).then(() => tickLoader());
-
-    setInterval(fetchTrades, 30_000);
+    ]).then(() => {
+        loadHistoryTrades();
+        tickLoader();
+    });
     </script>
 
 </body>

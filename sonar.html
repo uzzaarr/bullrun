@@ -289,13 +289,19 @@
     }
 
     // ── KPI Cards ────────────────────────────────────────
+    function setKpi(id, text, titleText) {
+        const el = document.getElementById(id);
+        el.textContent = text;
+        if (titleText) el.title = titleText;
+    }
+
     function renderKPIs() {
         const o = SONAR_OVERVIEW;
         document.getElementById('kpi-participants').textContent = o.participants.toLocaleString();
-        document.getElementById('kpi-allocated').textContent   = fmtINX(o.inx_allocated);
-        document.getElementById('kpi-vested').textContent      = fmtINX(o.inx_vested);
+        setKpi('kpi-allocated', fmtINX(o.inx_allocated), fmtINXFull(o.inx_allocated) + ' INX');
+        setKpi('kpi-vested',    fmtINX(o.inx_vested),    fmtINXFull(o.inx_vested)    + ' INX');
         document.getElementById('kpi-vested-pct').textContent  = o.inx_vested_pct + '%';
-        document.getElementById('kpi-claimed').textContent     = fmtINX(o.inx_claimed);
+        setKpi('kpi-claimed',   fmtINX(o.inx_claimed),   fmtINXFull(o.inx_claimed)   + ' INX');
         document.getElementById('kpi-claimed-pct').textContent = o.inx_claimed_pct + '%';
         document.getElementById('kpi-claimants').textContent   = o.claimants.toLocaleString();
         document.getElementById('kpi-claimants-2').textContent = o.claimants.toLocaleString();

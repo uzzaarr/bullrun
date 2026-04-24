@@ -1,0 +1,32 @@
+name: Refresh Trade History
+
+on:
+  schedule:
+    - cron: '30 */6 * * *'   # every 6 hours, offset 30min from whale refresh
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch trade history
+        run: node trades-refresh.mjs
+        env:
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+
+      - name: Commit and push trades-history.js
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add trades-history.js
+          git diff --staged --quiet || git commit -m "chore: auto-refresh trade history"
+          git pull --rebase
+          git push
