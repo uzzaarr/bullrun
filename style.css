@@ -256,9 +256,7 @@ h1 {
 /* Table Container */
 .table-container {
     position: relative;
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: #0d0d0d;
     border: 1px solid var(--border-color);
     border-radius: 20px;
     overflow: hidden;
@@ -278,7 +276,7 @@ th, td {
 }
 
 th {
-    background: rgba(10, 10, 10, 0.95);
+    background: #0d0d0d;
     color: var(--text-tertiary);
     font-size: 11px;
     text-transform: uppercase;
@@ -288,7 +286,6 @@ th {
     position: sticky;
     top: 0;
     z-index: 10;
-    backdrop-filter: blur(10px);
 }
 
 td {
@@ -418,6 +415,9 @@ footer a:hover::after {
 .table-container::-webkit-scrollbar-thumb:hover {
     background: rgba(247, 107, 28, 0.5);
 }
+
+/* Skip loader on repeat visits within the same session */
+.no-loader #loaderScreen { display: none !important; }
 
 /* Loader Screen */
 .loader-screen {
