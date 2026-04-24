@@ -566,6 +566,14 @@ footer a:hover::after {
     padding: 24px 24px 0;
     position: relative;
     z-index: 10;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.page-nav::-webkit-scrollbar {
+    display: none;
 }
 
 .nav-link {
@@ -581,6 +589,8 @@ footer a:hover::after {
     background: rgba(10, 10, 10, 0.8);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .nav-link:hover {
