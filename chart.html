@@ -999,7 +999,8 @@
         }
 
         const frag = document.createDocumentFragment();
-        for (const t of trades) frag.appendChild(createTradeCard(t));
+        const visible = trades.slice(0, 200);
+        for (const t of visible) frag.appendChild(createTradeCard(t));
         list.appendChild(frag);
     }
 
