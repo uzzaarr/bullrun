@@ -11,34 +11,75 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.1.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        /* Timeframe bar */
-        .timeframe-bar {
+        /* ── Wide container for two-column layout ── */
+        .chart-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 60px 24px 40px;
+        }
+
+        /* ── Two-column layout ── */
+        .chart-layout {
             display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .chart-col {
+            flex: 6;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .feed-col {
+            flex: 4;
+            min-width: 0;
+        }
+
+        /* ── Interval bar ── */
+        .interval-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
             flex-wrap: wrap;
         }
-        .tf-btn {
-            padding: 7px 18px;
+        .iv-btn {
+            padding: 7px 16px;
             border-radius: 100px;
             border: 1px solid var(--border-color);
             color: var(--text-secondary);
             background: rgba(10,10,10,0.8);
-            font-size: 13px;
-            font-weight: 600;
-            font-family: var(--font-main);
+            font-size: 12px;
+            font-weight: 700;
+            font-family: var(--font-mono);
             cursor: pointer;
             transition: all 0.25s ease;
+            letter-spacing: 0.5px;
         }
-        .tf-btn:hover { border-color: rgba(247,107,28,0.4); color: var(--accent-color); }
-        .tf-btn.active {
+        .iv-btn:hover { border-color: rgba(247,107,28,0.4); color: var(--accent-color); }
+        .iv-btn.active {
             border-color: var(--accent-color);
             color: var(--accent-color);
             background: rgba(247,107,28,0.08);
             box-shadow: 0 0 16px rgba(247,107,28,0.16);
         }
+        .iv-reset {
+            margin-left: auto;
+            padding: 7px 14px;
+            border-radius: 100px;
+            border: 1px solid var(--border-color);
+            color: var(--text-tertiary);
+            background: rgba(10,10,10,0.8);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 0.5px;
+        }
+        .iv-reset:hover { border-color: rgba(247,107,28,0.3); color: var(--text-secondary); }
 
-        /* Chart container */
+        /* ── Chart card ── */
         #chart-wrap {
             position: relative;
             border-radius: 20px;
@@ -46,11 +87,32 @@
             border: 1px solid var(--border-color);
             box-shadow: var(--card-shadow);
             background: #000;
-            height: 580px;
+            height: 540px;
         }
         #chart { width: 100%; height: 100%; }
 
-        /* Popup */
+        /* ── Chart error ── */
+        #chart-error {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-family: var(--font-mono);
+        }
+
+        /* ── Chart legend ── */
+        .chart-legend {
+            display: none;
+            gap: 18px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-family: var(--font-mono);
+        }
+        .leg { display: flex; align-items: center; gap: 6px; }
+        .leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+        /* ── Popup overlay ── */
         #popup {
             display: none;
             position: absolute;
@@ -59,10 +121,9 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 10px 14px;
-            min-width: 200px;
-            max-width: 260px;
+            min-width: 210px;
+            max-width: 270px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.7);
-            pointer-events: auto;
         }
         .popup-row {
             display: flex;
@@ -84,7 +145,7 @@
         }
         .popup-badge.buy  { background: rgba(247,107,28,0.15); color: #F76B1C; }
         .popup-badge.sell { background: rgba(136,136,136,0.12); color: #aaa; }
-        .popup-amt { color: #fff; flex: 1; font-weight: 700; }
+        .popup-amt  { color: #fff; flex: 1; font-weight: 700; }
         .popup-link {
             color: var(--text-tertiary);
             text-decoration: none;
@@ -93,28 +154,220 @@
         }
         .popup-link:hover { color: var(--accent-color); }
 
-        /* Error */
-        #chart-error {
-            display: none;
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
-            font-size: 14px;
+        /* ── Whale feed card ── */
+        .feed-card {
+            background: rgba(9,9,9,0.97);
+            border: 1px solid rgba(255,255,255,0.055);
+            border-radius: 20px;
+            overflow: hidden;
+            height: 620px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--card-shadow);
+        }
+        .feed-header {
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+        .feed-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        .feed-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--accent-color);
+            box-shadow: 0 0 8px rgba(247,107,28,0.7);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
+        }
+        .feed-threshold {
+            font-size: 9px;
+            color: var(--text-tertiary);
+            letter-spacing: 1px;
         }
 
-        /* Legend */
-        .chart-legend {
+        /* Time filter */
+        .time-filter {
             display: flex;
-            gap: 18px;
-            margin-top: 10px;
-            font-size: 12px;
+            gap: 5px;
+        }
+        .tf-preset {
+            padding: 4px 10px;
+            border-radius: 100px;
+            border: 1px solid var(--border-color);
+            color: var(--text-tertiary);
+            background: transparent;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
+        }
+        .tf-preset:hover { border-color: rgba(247,107,28,0.3); color: var(--text-secondary); }
+        .tf-preset.active {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: rgba(247,107,28,0.06);
+        }
+
+        /* Feed list */
+        .feed-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(247,107,28,0.2) transparent;
+        }
+        .feed-list::-webkit-scrollbar { width: 3px; }
+        .feed-list::-webkit-scrollbar-thumb { background: rgba(247,107,28,0.2); border-radius: 2px; }
+
+        .feed-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             color: var(--text-tertiary);
             font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 40px 20px;
+            text-align: center;
+            flex: 1;
         }
-        .leg { display: flex; align-items: center; gap: 6px; }
-        .leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .feed-empty-icon { font-size: 22px; opacity: 0.2; }
 
-        @media (max-width: 768px) {
+        /* Trade card */
+        .trade-card {
+            background: rgba(15,15,15,0.6);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 14px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .trade-card:hover {
+            border-color: rgba(247,107,28,0.18);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(247,107,28,0.06);
+            transform: translateY(-2px);
+        }
+        .trade-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .trade-type {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .type-dot {
+            width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+        }
+        .type-dot.buy  { background: #F76B1C; box-shadow: 0 0 7px rgba(247,107,28,0.8); }
+        .type-dot.sell { background: #555;    box-shadow: 0 0 7px rgba(85,85,85,0.6); }
+        .type-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .type-label.buy  { color: #F76B1C; }
+        .type-label.sell { color: #888; }
+        .trade-time {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-tertiary);
+            letter-spacing: 0.5px;
+            background: rgba(255,255,255,0.04);
+            padding: 3px 8px;
+            border-radius: 100px;
+        }
+        .trade-bottom {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+        .trade-amounts {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .trade-inx {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+        .trade-inx-unit {
+            font-size: 10px;
+            color: #666;
+            font-weight: 400;
+            margin-left: 4px;
+        }
+        .trade-usd {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+        .trade-tx {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tx-hash {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: #333;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .tx-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #666;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .tx-link:hover { background: rgba(247,107,28,0.1); border-color: rgba(247,107,28,0.3); color: #F76B1C; }
+
+        /* Mobile stack */
+        @media (max-width: 900px) {
+            .chart-layout { flex-direction: column; }
+            .feed-card { height: 480px; }
             #chart-wrap { height: 400px; }
         }
     </style>
@@ -142,42 +395,70 @@
         <a href="/chart" class="nav-link active">Chart</a>
     </nav>
 
-    <div class="container sonar-container">
+    <div class="chart-container">
 
         <header class="sonar-header">
             <div class="logo-wrapper">
                 <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
-                <div class="logo-glow"></div>
+                <div class="loader-glow"></div>
             </div>
             <h1>INX Price Chart</h1>
-            <p class="subtitle">INX/USD · Uniswap V4 · Whale markers clickable</p>
+            <p class="subtitle">INX/USD · Uniswap V3 · Live whale markers</p>
             <div class="last-updated" id="priceBadge">
                 <span class="last-updated-dot"></span>
                 <span id="priceText">Loading...</span>
             </div>
         </header>
 
-        <section class="section">
-            <div class="timeframe-bar">
-                <button class="tf-btn" data-days="1">1D</button>
-                <button class="tf-btn active" data-days="7">7D</button>
-                <button class="tf-btn" data-days="30">30D</button>
-                <button class="tf-btn" data-days="90">90D</button>
+        <div class="chart-layout">
+
+            <!-- ── Chart column ── -->
+            <div class="chart-col">
+                <div class="interval-bar">
+                    <button class="iv-btn" data-tf="minute" data-agg="5">5m</button>
+                    <button class="iv-btn" data-tf="minute" data-agg="15">15m</button>
+                    <button class="iv-btn active" data-tf="hour" data-agg="1">1h</button>
+                    <button class="iv-btn" data-tf="hour" data-agg="4">4h</button>
+                    <button class="iv-btn" data-tf="day" data-agg="1">1d</button>
+                    <button class="iv-reset" id="resetBtn">&#8635; Reset</button>
+                </div>
+
+                <div id="chart-wrap">
+                    <div id="chart"></div>
+                    <div id="popup"></div>
+                </div>
+                <div id="chart-error">Failed to load chart data. Please try again.</div>
+
+                <div class="chart-legend" id="chartLegend">
+                    <div class="leg"><div class="leg-dot" style="background:#F76B1C"></div>B = Whale Buy</div>
+                    <div class="leg"><div class="leg-dot" style="background:#555"></div>S = Whale Sell</div>
+                    <div class="leg" style="color:var(--text-tertiary);font-size:10px;">Click marker or trade card to zoom</div>
+                </div>
             </div>
 
-            <div id="chart-wrap">
-                <div id="chart"></div>
-                <div id="popup"></div>
+            <!-- ── Whale feed column ── -->
+            <div class="feed-col">
+                <div class="feed-card">
+                    <div class="feed-header">
+                        <div class="feed-title">
+                            <div class="feed-dot"></div>
+                            Whale Feed
+                            <span class="feed-threshold">&gt; 100k INX</span>
+                        </div>
+                        <div class="time-filter" id="timeFilter">
+                            <button class="tf-preset" data-hours="1">1H</button>
+                            <button class="tf-preset" data-hours="6">6H</button>
+                            <button class="tf-preset active" data-hours="24">24H</button>
+                            <button class="tf-preset" data-hours="168">7D</button>
+                            <button class="tf-preset" data-hours="0">All</button>
+                        </div>
+                    </div>
+                    <div class="feed-list" id="feedList"></div>
+                </div>
             </div>
-            <div id="chart-error">Failed to load chart data. Please try again later.</div>
 
-            <div class="chart-legend" id="whaleLegend" style="display:none">
-                <div class="leg"><div class="leg-dot" style="background:#F76B1C"></div>B = Whale Buy (click for details)</div>
-                <div class="leg"><div class="leg-dot" style="background:#888"></div>S = Whale Sell (click for details)</div>
-            </div>
-        </section>
-
-    </div>
+        </div><!-- /.chart-layout -->
+    </div><!-- /.chart-container -->
 
     <footer>
         <a href="https://infinex.xyz" target="_blank" rel="noopener">infinex.xyz</a>
@@ -188,17 +469,30 @@
         <a href="https://x.com/MazinoTower" target="_blank" rel="noopener">@MazinoTower</a>
     </footer>
 
-    <script src="whale-data.js"></script>
     <script>
+    // ── Constants ────────────────────────────────────────
+    const INX_CA    = '0xdef1b2d939edc0e4d35806c59b3166f790175afe';
+    const MIN_WHALE = 100_000;
+
+    // ── State ────────────────────────────────────────────
+    let currentCandles  = [];       // [{time,open,high,low,close}]
+    let allTrades       = [];       // whale trades from GeckoTerminal
+    let activeHours     = 24;       // time filter preset
+    let markerMap       = new Map();// snapped_time → [trade, ...]
+    let markersPlugin   = null;
+    let activeFocusTime = null;     // candle time of zoomed marker
+    let currentTf       = 'hour';
+    let currentAgg      = '1';
+
     // ── Loader ───────────────────────────────────────────
     const loaderProgress = document.getElementById('loaderProgress');
     const loaderScreen   = document.getElementById('loaderScreen');
-    let progress = 0;
-    function updateLoader() {
-        progress += Math.random() * 18 + 6;
-        if (progress > 100) progress = 100;
-        loaderProgress.style.width = progress + '%';
-        if (progress < 100) setTimeout(updateLoader, 130);
+    let _progress = 0;
+    function tickLoader() {
+        _progress += Math.random() * 18 + 6;
+        if (_progress > 100) _progress = 100;
+        loaderProgress.style.width = _progress + '%';
+        if (_progress < 100) setTimeout(tickLoader, 130);
         else setTimeout(() => {
             loaderScreen.classList.add('fade-out');
             setTimeout(() => { loaderScreen.style.display = 'none'; }, 500);
@@ -209,7 +503,7 @@
     const wrap    = document.getElementById('chart-wrap');
     const popup   = document.getElementById('popup');
     const errorEl = document.getElementById('chart-error');
-    const legendEl = document.getElementById('whaleLegend');
+    const legendEl = document.getElementById('chartLegend');
 
     const chart = LightweightCharts.createChart(document.getElementById('chart'), {
         autoSize: true,
@@ -228,9 +522,7 @@
             horzLine: { color: 'rgba(247,107,28,0.4)', labelBackgroundColor: '#F76B1C' },
         },
         rightPriceScale: { borderColor: '#1a1a1a' },
-        timeScale:        { borderColor: '#1a1a1a', timeVisible: true, secondsVisible: false },
-        handleScroll: true,
-        handleScale:  true,
+        timeScale: { borderColor: '#1a1a1a', timeVisible: true, secondsVisible: false },
     });
 
     const series = chart.addSeries(LightweightCharts.CandlestickSeries, {
@@ -241,117 +533,103 @@
         wickDownColor: '#555',
     });
 
+    // ── Trade helpers ────────────────────────────────────
+    function isBuy(t) {
+        return t.attributes.from_token_address.toLowerCase() !== INX_CA;
+    }
 
-    // ── Whale marker map ─────────────────────────────────
-    // Maps snapped-candle-time → array of whale txs
-    let markerMap = new Map();
+    function inxAmt(t) {
+        return isBuy(t)
+            ? parseFloat(t.attributes.to_token_amount)
+            : parseFloat(t.attributes.from_token_amount);
+    }
 
-    function buildMarkers(candles) {
+    function fmtINX(n) {
+        if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+        if (n >= 1e3) return Math.round(n / 1e3) + 'K';
+        return n.toLocaleString();
+    }
+
+    function fmtUSD(n) {
+        if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+        if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K';
+        return '$' + n.toFixed(2);
+    }
+
+    function timeAgo(iso) {
+        const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+        if (diff < 60)    return diff + 's ago';
+        if (diff < 3600)  return Math.floor(diff / 60) + 'm ago';
+        if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+        return Math.floor(diff / 86400) + 'd ago';
+    }
+
+    // ── Markers ──────────────────────────────────────────
+    function snapToCandle(ts) {
+        if (!currentCandles.length) return null;
+        return currentCandles.reduce((best, c) =>
+            Math.abs(c.time - ts) < Math.abs(best.time - ts) ? c : best
+        ).time;
+    }
+
+    function buildAndApplyMarkers() {
         markerMap = new Map();
-        if (typeof WHALE_TRANSFERS === 'undefined' || !candles.length) return [];
+        if (!currentCandles.length || !allTrades.length) {
+            if (markersPlugin) markersPlugin.setMarkers([]);
+            return;
+        }
 
-        const start = candles[0].time;
-        const end   = candles[candles.length - 1].time;
+        const start = currentCandles[0].time;
+        const end   = currentCandles[currentCandles.length - 1].time;
 
-        for (const tx of WHALE_TRANSFERS) {
-            if (tx.type !== 'buy' && tx.type !== 'sell') continue;
-            if (tx.ts < start || tx.ts > end) continue;
-
-            // Snap to nearest candle
-            const snapped = candles.reduce((best, c) =>
-                Math.abs(c.time - tx.ts) < Math.abs(best.time - tx.ts) ? c : best
-            ).time;
-
+        for (const t of allTrades) {
+            const ts = Math.floor(new Date(t.attributes.block_timestamp).getTime() / 1000);
+            if (ts < start || ts > end) continue;
+            const snapped = snapToCandle(ts);
             if (!markerMap.has(snapped)) markerMap.set(snapped, []);
-            markerMap.get(snapped).push(tx);
+            markerMap.get(snapped).push(t);
         }
 
         const markers = [];
         for (const [time, txs] of markerMap) {
-            const hasBuy  = txs.some(t => t.type === 'buy');
-            const hasSell = txs.some(t => t.type === 'sell');
-            // Show one marker per side to keep chart clean
-            if (hasBuy) markers.push({
-                time, position: 'belowBar', color: '#F76B1C',
-                shape: 'arrowUp', text: 'B',
-            });
-            if (hasSell) markers.push({
-                time, position: 'aboveBar', color: '#888',
-                shape: 'arrowDown', text: 'S',
-            });
+            const hasBuy  = txs.some(t => isBuy(t));
+            const hasSell = txs.some(t => !isBuy(t));
+            if (hasBuy)  markers.push({ time, position: 'belowBar', color: '#F76B1C', shape: 'arrowUp',   text: 'B' });
+            if (hasSell) markers.push({ time, position: 'aboveBar', color: '#555',    shape: 'arrowDown', text: 'S' });
         }
-        return markers.sort((a, b) => a.time - b.time);
+        markers.sort((a, b) => a.time - b.time);
+
+        if (markersPlugin) {
+            markersPlugin.setMarkers(markers);
+        } else {
+            markersPlugin = LightweightCharts.createSeriesMarkers(series, markers);
+        }
+        legendEl.style.display = markers.length ? 'flex' : 'none';
     }
 
-    // ── Popup ────────────────────────────────────────────
-    function fmtAmt(n) {
-        if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M INX';
-        if (n >= 1e3) return Math.round(n / 1e3) + 'K INX';
-        return n.toLocaleString() + ' INX';
-    }
-
-    function showPopup(txs, x, y) {
-        popup.textContent = '';
-        txs.forEach(tx => {
-            const row = document.createElement('div');
-            row.className = 'popup-row';
-
-            const badge = document.createElement('span');
-            badge.className = 'popup-badge ' + tx.type;
-            badge.textContent = tx.type === 'buy' ? 'BUY' : 'SELL';
-            row.appendChild(badge);
-
-            const amt = document.createElement('span');
-            amt.className = 'popup-amt';
-            amt.textContent = fmtAmt(tx.amount);
-            row.appendChild(amt);
-
-            const link = document.createElement('a');
-            link.className = 'popup-link';
-            link.href = 'https://etherscan.io/tx/' + tx.hash;
-            link.target = '_blank';
-            link.rel = 'noopener';
-            link.textContent = 'TX ↗';
-            row.appendChild(link);
-
-            popup.appendChild(row);
-        });
-
-        // Keep popup within chart bounds
-        const pw = 260, ph = txs.length * 44 + 16;
-        const cx = Math.min(x + 14, wrap.clientWidth  - pw - 8);
-        const cy = Math.max(Math.min(y - ph / 2, wrap.clientHeight - ph - 8), 8);
-        popup.style.left    = cx + 'px';
-        popup.style.top     = cy + 'px';
-        popup.style.display = 'block';
-    }
-
-    chart.subscribeClick(param => {
-        if (!param.time) { popup.style.display = 'none'; return; }
-        const txs = markerMap.get(param.time);
-        if (!txs || !txs.length) { popup.style.display = 'none'; return; }
-        showPopup(txs, param.point.x, param.point.y);
-    });
-
-    // ── Load chart data ──────────────────────────────────
-    async function loadChart(days) {
+    // ── Chart data ───────────────────────────────────────
+    async function loadChart(tf, agg) {
         popup.style.display = 'none';
+        activeFocusTime = null;
         try {
-            const res  = await fetch('/api/inx-chart?days=' + days);
-            const { data } = await res.json();
-            if (!data || !data.length) throw new Error('empty');
+            const res  = await fetch('/api/ohlcv?timeframe=' + tf + '&aggregate=' + agg);
+            const json = await res.json();
+            const raw  = json?.data?.attributes?.ohlcv_list ?? [];
+            if (!raw.length) throw new Error('empty');
 
-            series.setData(data);
+            const seen = new Map();
+            for (const item of raw) seen.set(item[0], item);
+            currentCandles = [...seen.values()]
+                .sort((a, b) => a[0] - b[0])
+                .map(item => ({ time: item[0], open: +item[1], high: +item[2], low: +item[3], close: +item[4] }));
 
-            const markers = buildMarkers(data);
-            series.setMarkers(markers);
-            legendEl.style.display = markers.length ? 'flex' : 'none';
-
+            series.setData(currentCandles);
+            buildAndApplyMarkers();
             chart.timeScale().fitContent();
-            wrap.style.display  = '';
+            wrap.style.display    = '';
             errorEl.style.display = 'none';
         } catch {
-            wrap.style.display  = 'none';
+            wrap.style.display    = 'none';
             errorEl.style.display = 'block';
             legendEl.style.display = 'none';
         }
@@ -367,17 +645,221 @@
         } catch { /* ignore */ }
     }
 
-    // ── Timeframe buttons ────────────────────────────────
-    document.querySelectorAll('.tf-btn').forEach(btn => {
+    // ── Popup on chart click ─────────────────────────────
+    function makeEl(tag, cls) {
+        const el = document.createElement(tag);
+        if (cls) el.className = cls;
+        return el;
+    }
+
+    function showPopup(txs, x, y) {
+        popup.textContent = '';
+        for (const t of txs) {
+            const buy  = isBuy(t);
+            const row  = makeEl('div', 'popup-row');
+
+            const badge = makeEl('span', 'popup-badge ' + (buy ? 'buy' : 'sell'));
+            badge.textContent = buy ? 'BUY' : 'SELL';
+
+            const amt = makeEl('span', 'popup-amt');
+            amt.textContent = fmtINX(inxAmt(t)) + ' INX';
+
+            const link = makeEl('a', 'popup-link');
+            link.href   = 'https://etherscan.io/tx/' + encodeURIComponent(t.attributes.tx_hash);
+            link.target = '_blank';
+            link.rel    = 'noopener';
+            link.textContent = 'TX ↗';
+
+            row.append(badge, amt, link);
+            popup.appendChild(row);
+        }
+
+        const pw = 270, ph = txs.length * 44 + 16;
+        const cx = Math.min(x + 14, wrap.clientWidth  - pw - 8);
+        const cy = Math.max(Math.min(y - ph / 2, wrap.clientHeight - ph - 8), 8);
+        popup.style.left    = cx + 'px';
+        popup.style.top     = cy + 'px';
+        popup.style.display = 'block';
+    }
+
+    chart.subscribeClick(param => {
+        if (!param.time) { popup.style.display = 'none'; return; }
+        const txs = markerMap.get(param.time);
+        if (!txs || !txs.length) { popup.style.display = 'none'; return; }
+        showPopup(txs, param.point.x, param.point.y);
+    });
+
+    // ── Whale feed ───────────────────────────────────────
+    function filteredTrades() {
+        if (!activeHours) return allTrades;
+        const cutoff = Date.now() - activeHours * 3_600_000;
+        return allTrades.filter(t => new Date(t.attributes.block_timestamp).getTime() >= cutoff);
+    }
+
+    function createTradeCard(t) {
+        const buy  = isBuy(t);
+        const inx  = inxAmt(t);
+        const usd  = parseFloat(t.attributes.volume_in_usd);
+        const hash = t.attributes.tx_hash;
+        const ts   = t.attributes.block_timestamp;
+
+        const card = makeEl('div', 'trade-card');
+
+        // Top row
+        const top       = makeEl('div', 'trade-top');
+        const typeWrap  = makeEl('div', 'trade-type');
+        const dot       = makeEl('div', 'type-dot ' + (buy ? 'buy' : 'sell'));
+        const label     = makeEl('span', 'type-label ' + (buy ? 'buy' : 'sell'));
+        label.textContent = buy ? 'Buy' : 'Sell';
+        typeWrap.append(dot, label);
+
+        const time = makeEl('span', 'trade-time');
+        time.textContent = timeAgo(ts);
+
+        top.append(typeWrap, time);
+
+        // Bottom row
+        const bottom  = makeEl('div', 'trade-bottom');
+        const amounts = makeEl('div', 'trade-amounts');
+
+        const inxRow  = makeEl('div', 'trade-inx');
+        inxRow.textContent = fmtINX(inx);
+        const unit    = makeEl('span', 'trade-inx-unit');
+        unit.textContent = 'INX';
+        inxRow.appendChild(unit);
+
+        const usdRow  = makeEl('div', 'trade-usd');
+        usdRow.textContent = fmtUSD(usd);
+
+        amounts.append(inxRow, usdRow);
+
+        const txWrap  = makeEl('div', 'trade-tx');
+        const hashEl  = makeEl('span', 'tx-hash');
+        hashEl.textContent = hash.slice(0, 6) + '…' + hash.slice(-4);
+
+        const txLink  = makeEl('a', 'tx-link');
+        txLink.href   = 'https://etherscan.io/tx/' + encodeURIComponent(hash);
+        txLink.target = '_blank';
+        txLink.rel    = 'noopener';
+        txLink.title  = 'View on Etherscan';
+        txLink.textContent = '↗';
+        txLink.addEventListener('click', e => e.stopPropagation());
+
+        txWrap.append(hashEl, txLink);
+        bottom.append(amounts, txWrap);
+        card.append(top, bottom);
+
+        // Click → focus chart
+        card.addEventListener('click', () => {
+            const secs    = Math.floor(new Date(ts).getTime() / 1000);
+            const snapped = snapToCandle(secs);
+            if (!snapped) return;
+
+            if (activeFocusTime === snapped) {
+                activeFocusTime = null;
+                buildAndApplyMarkers();
+                chart.timeScale().fitContent();
+                return;
+            }
+
+            activeFocusTime = snapped;
+
+            const aggSecs = currentTf === 'minute' ? parseInt(currentAgg) * 60
+                          : currentTf === 'hour'   ? parseInt(currentAgg) * 3600
+                          : 86400;
+
+            const focusMarker = {
+                time:     snapped,
+                position: buy ? 'belowBar' : 'aboveBar',
+                color:    buy ? '#F76B1C' : '#888',
+                shape:    buy ? 'arrowUp' : 'arrowDown',
+                text:     buy ? 'B' : 'S',
+            };
+            if (markersPlugin) {
+                markersPlugin.setMarkers([focusMarker]);
+            } else {
+                markersPlugin = LightweightCharts.createSeriesMarkers(series, [focusMarker]);
+            }
+            chart.timeScale().setVisibleRange({
+                from: snapped - aggSecs * 12,
+                to:   snapped + aggSecs * 12,
+            });
+        });
+
+        return card;
+    }
+
+    function renderFeed() {
+        const list   = document.getElementById('feedList');
+        const trades = filteredTrades();
+        list.textContent = '';
+
+        if (!trades.length) {
+            const empty = makeEl('div', 'feed-empty');
+            const icon  = makeEl('div', 'feed-empty-icon');
+            icon.textContent = '~';
+            const msg = makeEl('div');
+            msg.textContent = allTrades.length ? 'No trades in this window' : 'Scanning network…';
+            empty.append(icon, msg);
+            list.appendChild(empty);
+            return;
+        }
+
+        const frag = document.createDocumentFragment();
+        for (const t of trades) frag.appendChild(createTradeCard(t));
+        list.appendChild(frag);
+    }
+
+    async function fetchTrades() {
+        try {
+            const res  = await fetch('/api/trades');
+            const json = await res.json();
+            if (!Array.isArray(json?.data)) return;
+            allTrades = json.data.filter(t => {
+                try { return inxAmt(t) >= MIN_WHALE; }
+                catch { return false; }
+            });
+            renderFeed();
+            buildAndApplyMarkers();
+        } catch { /* keep stale data */ }
+    }
+
+    // ── Interval buttons ─────────────────────────────────
+    document.querySelectorAll('.iv-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.iv-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            loadChart(btn.dataset.days);
+            currentTf  = btn.dataset.tf;
+            currentAgg = btn.dataset.agg;
+            loadChart(currentTf, currentAgg);
+        });
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        activeFocusTime = null;
+        buildAndApplyMarkers();
+        chart.timeScale().fitContent();
+        popup.style.display = 'none';
+    });
+
+    // ── Time filter buttons ──────────────────────────────
+    document.querySelectorAll('.tf-preset').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tf-preset').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeHours = parseInt(btn.dataset.hours);
+            renderFeed();
         });
     });
 
     // ── Init ─────────────────────────────────────────────
-    Promise.all([loadChart(7), fetchPrice()]).then(() => updateLoader());
+    Promise.all([
+        loadChart('hour', '1'),
+        fetchPrice(),
+        fetchTrades(),
+    ]).then(() => tickLoader());
+
+    setInterval(fetchTrades, 30_000);
     </script>
 
 </body>
