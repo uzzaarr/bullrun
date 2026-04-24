@@ -83,12 +83,14 @@
         /* ── Chart card ── */
         #chart-wrap {
             position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            min-height: 400px;
             border-radius: 16px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.1);
             box-shadow: 0 0 0 1px rgba(247,107,28,0.08), var(--card-shadow);
             background: #000;
-            height: 620px;
         }
         #chart { width: 100%; height: 100%; }
 
@@ -504,7 +506,6 @@
             .chart-container { padding: 16px 12px 30px; }
             .chart-layout { flex-direction: column; }
             .feed-card { height: 420px; }
-            #chart-wrap { height: 340px; }
             .sonar-header { margin-bottom: 16px !important; }
             .sonar-header .logo-wrapper { display: none; }
             .sonar-header h1 { font-size: 28px !important; }
@@ -709,18 +710,11 @@
 
     const chartEl = document.getElementById('chart');
 
-    // Use explicit dimensions — do NOT use autoSize:true.
-    // autoSize owns the canvas internally via its own ResizeObserver, which
-    // conflicts with our manual applyOptions calls and can leave mobile at 0×0.
-    function resizeChart() {
-        const w = wrap.clientWidth;
-        const h = wrap.clientHeight;
-        if (w > 0 && h > 0) chart.applyOptions({ width: w, height: h });
-    }
-
+    // autoSize: true — LWC observes #chart-wrap via its own ResizeObserver.
+    // The container uses aspect-ratio CSS so it always has a proper pixel height.
+    // On mobile #chart-wrap is display:none so LWC never sees a 0×0 size.
     const chart = LightweightCharts.createChart(chartEl, {
-        width:  wrap.clientWidth  || 400,
-        height: wrap.clientHeight || 340,
+        autoSize: true,
         layout: {
             background: { type: 'solid', color: '#000' },
             textColor: '#888',
@@ -740,8 +734,6 @@
         timeScale: { borderColor: '#222', timeVisible: true, secondsVisible: false },
     });
 
-    new ResizeObserver(resizeChart).observe(wrap);
-    window.addEventListener('resize', resizeChart);
 
     const series = chart.addSeries(LightweightCharts.CandlestickSeries, {
         upColor:          '#F76B1C',
@@ -830,8 +822,6 @@
                 .map(item => ({ time: item[0], open: +item[1], high: +item[2], low: +item[3], close: +item[4] }));
 
             series.setData(currentCandles);
-            // Force correct canvas size — layout is fully settled by the time data arrives.
-            resizeChart();
             clearMarker();
             buildMarkerMap();
             requestAnimationFrame(() => chart.timeScale().fitContent());
