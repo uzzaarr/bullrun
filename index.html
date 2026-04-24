@@ -98,69 +98,36 @@
         const totalCountEl = document.getElementById("totalCount");
         const displayCountEl = document.getElementById("displayCount");
 
-        let currentData = [];
-        let displayedRows = 0;
-        const BATCH_SIZE = 50;
-        let isLoading = false;
+        function updateStats(n) {
+            totalCountEl.textContent = n.toLocaleString();
+            displayCountEl.textContent = n.toLocaleString();
+        }
 
-        function updateStats(total, displayed) {
-            totalCountEl.textContent = total.toLocaleString();
-            displayCountEl.textContent = displayed.toLocaleString();
+        function cell(cls, text) {
+            const td = document.createElement('td');
+            const span = document.createElement('span');
+            span.className = cls;
+            span.textContent = text;
+            td.appendChild(span);
+            return td;
         }
 
         function createRow(item) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><span class="rank-badge">#${item.rank}</span></td>
-                <td><span class="username">${escapeHtml(item.username)}</span></td>
-                <td><span class="rewards">${item.patron} Patron + ${item.crates} Crates</span></td>
-            `;
+            tr.appendChild(cell('rank-badge', '#' + item.rank));
+            tr.appendChild(cell('username', item.username));
+            tr.appendChild(cell('rewards', item.patron + ' Patron + ' + item.crates + ' Crates'));
             return tr;
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function loadMoreRows() {
-            if (isLoading || displayedRows >= currentData.length) return;
-            
-            isLoading = true;
-            loadingIndicator.style.display = 'flex';
-
-            setTimeout(() => {
-                const fragment = document.createDocumentFragment();
-                const end = Math.min(displayedRows + BATCH_SIZE, currentData.length);
-                
-                for (let i = displayedRows; i < end; i++) {
-                    fragment.appendChild(createRow(currentData[i]));
-                }
-                
-                tbody.appendChild(fragment);
-                displayedRows = end;
-                updateStats(currentData.length, displayedRows);
-                
-                isLoading = false;
-                loadingIndicator.style.display = displayedRows >= currentData.length ? 'none' : 'flex';
-            }, 100);
-        }
-
         function loadTable(data) {
-            tbody.innerHTML = "";
-            currentData = data;
-            displayedRows = 0;
-            isLoading = false;
-            loadMoreRows();
+            const frag = document.createDocumentFragment();
+            for (const item of data) frag.appendChild(createRow(item));
+            tbody.textContent = '';
+            tbody.appendChild(frag);
+            loadingIndicator.style.display = 'none';
+            updateStats(data.length);
         }
-
-        const tableContainer = document.querySelector('.table-container');
-        tableContainer.addEventListener('scroll', () => {
-            if (tableContainer.scrollTop + tableContainer.clientHeight >= tableContainer.scrollHeight - 200) {
-                loadMoreRows();
-            }
-        });
 
         const loaderScreen = document.getElementById('loaderScreen');
         const loaderProgress = document.getElementById('loaderProgress');
@@ -194,16 +161,7 @@
             const filtered = LEADERBOARD.filter(item =>
                 item.username.toLowerCase().includes(value)
             );
-            const frag = document.createDocumentFragment();
-            const end  = Math.min(BATCH_SIZE, filtered.length);
-            for (let i = 0; i < end; i++) frag.appendChild(createRow(filtered[i]));
-            tbody.innerHTML = '';
-            tbody.appendChild(frag);
-            currentData = filtered;
-            displayedRows = end;
-            isLoading = false;
-            updateStats(filtered.length, end);
-            loadingIndicator.style.display = end >= filtered.length ? 'none' : 'flex';
+            loadTable(filtered);
         }
     </script>
 

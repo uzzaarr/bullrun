@@ -357,13 +357,6 @@
         }
 
         // ── Transfers table ───────────────────────────────────────
-        const BATCH = 50;
-        const txState = {
-            current:   typeof WHALE_TRANSFERS !== 'undefined' ? WHALE_TRANSFERS.slice() : [],
-            displayed: 0,
-            loading:   false,
-            gen:       0,
-        };
 
         function createTxRow(tx) {
             const tr = document.createElement('tr');
@@ -405,33 +398,19 @@
             return tr;
         }
 
-        function renderTxBatch() {
-            if (txState.loading || txState.displayed >= txState.current.length) return;
-            txState.loading = true;
-            const loader  = document.getElementById('transfersLoader');
-            loader.style.display = 'flex';
-            const myGen = txState.gen;
-
-            setTimeout(() => {
-                if (myGen !== txState.gen) return;
-                const frag = document.createDocumentFragment();
-                const end  = Math.min(txState.displayed + BATCH, txState.current.length);
-                for (let i = txState.displayed; i < end; i++) {
-                    frag.appendChild(createTxRow(txState.current[i]));
-                }
-                document.getElementById('transfersBody').appendChild(frag);
-                txState.displayed = end;
-                txState.loading = false;
-                loader.style.display = txState.displayed >= txState.current.length ? 'none' : 'flex';
-                document.getElementById('transfersBadge').textContent =
-                    `${fmt(txState.displayed)} / ${fmt(txState.current.length)} transfers`;
-            }, 80);
+        function renderTransfers(data) {
+            const frag = document.createDocumentFragment();
+            for (const tx of data) frag.appendChild(createTxRow(tx));
+            const body = document.getElementById('transfersBody');
+            body.textContent = '';
+            body.appendChild(frag);
+            document.getElementById('transfersLoader').style.display = 'none';
+            document.getElementById('transfersBadge').textContent = fmt(data.length) + ' transfers';
         }
 
         function searchTransfers() {
             const q = document.getElementById('transferSearch').value.toLowerCase().trim();
-            txState.gen++;
-            txState.current = q
+            const filtered = q
                 ? WHALE_TRANSFERS.filter(tx =>
                     tx.from.toLowerCase().includes(q) ||
                     tx.to.toLowerCase().includes(q) ||
@@ -440,18 +419,8 @@
                     addrOrLabel(tx.to).includes(q)
                   )
                 : WHALE_TRANSFERS.slice();
-            txState.displayed = 0;
-            txState.loading = false;
-            document.getElementById('transfersBody').innerHTML = '';
-            renderTxBatch();
+            renderTransfers(filtered);
         }
-
-        document.getElementById('transfersContainer').addEventListener('scroll', e => {
-            const el = e.currentTarget;
-            if (el.scrollTop + el.clientHeight >= el.scrollHeight - 200) {
-                renderTxBatch();
-            }
-        });
 
         // ── Accumulators table ────────────────────────────────────
         function createAccumRow(w) {
@@ -529,7 +498,7 @@
             updateLoader();
             fetchInxPrice().then(() => {
                 populateKPIs();
-                renderTxBatch();
+                renderTransfers(WHALE_TRANSFERS.slice());
                 renderAccumulators(WHALE_ACCUMULATORS);
             });
         }
