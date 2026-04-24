@@ -38,30 +38,40 @@ function toINX(raw) {
 }
 
 const trades = [];
-let page = 1;
 let totalScanned = 0;
+let endBlock = 99_999_999; // start from latest, walk backwards
+let batch = 0;
 
 console.log(`Fetching INX whale swaps (≥${MIN_WHALE.toLocaleString()} INX) since TGE...`);
 
+// Block-based pagination: always page=1 but shift endblock backward each batch.
+// This bypasses Etherscan's 10K cap on page-based pagination.
 while (true) {
+  batch++;
   const url = `https://api.etherscan.io/v2/api?chainid=1&module=account&action=tokentx` +
-    `&contractaddress=${CONTRACT}&page=${page}&offset=${PAGE_SIZE}&sort=desc&apikey=${KEY}`;
+    `&contractaddress=${CONTRACT}&startblock=0&endblock=${endBlock}` +
+    `&page=1&offset=${PAGE_SIZE}&sort=desc&apikey=${KEY}`;
 
   const res = await get(url);
   if (!res || res.status !== '1') {
-    if (page === 1) throw new Error('Etherscan error: ' + (res?.result || 'empty response'));
-    console.log('No more pages or API limit reached');
+    if (batch === 1) throw new Error('Etherscan error: ' + (res?.result || 'empty response'));
+    console.log('No more data');
     break;
   }
 
   const txs = res.result;
   totalScanned += txs.length;
-  console.log(`Page ${page}: ${txs.length} transfers (total scanned: ${totalScanned})`);
+  console.log(`Batch ${batch}: ${txs.length} transfers (total scanned: ${totalScanned})`);
 
   let reachedTge = false;
+  let minBlock = Infinity;
+
   for (const tx of txs) {
     const ts = parseInt(tx.timeStamp);
-    if (ts < TGE_TS) { reachedTge = true; break; }
+    const blockNum = parseInt(tx.blockNumber);
+    if (blockNum < minBlock) minBlock = blockNum;
+
+    if (ts < TGE_TS) { reachedTge = true; continue; } // note min block then skip
 
     const amount = toINX(tx.value);
     if (amount < MIN_WHALE) continue;
@@ -70,15 +80,15 @@ while (true) {
     const to   = tx.to.toLowerCase();
 
     let type;
-    if (DEX.has(from))    type = 'buy';      // DEX/aggregator sent INX to user
-    else if (DEX.has(to)) type = 'sell';     // User sent INX to DEX/aggregator
-    else                  type = 'transfer'; // Direct transfer (pool→user, OTC, etc.)
+    if (DEX.has(from))    type = 'buy';
+    else if (DEX.has(to)) type = 'sell';
+    else                  type = 'transfer';
 
     trades.push({ hash: tx.hash, ts, type, inx: Math.round(amount) });
   }
 
   if (reachedTge || txs.length < PAGE_SIZE) break;
-  page++;
+  endBlock = minBlock - 1; // next batch: everything strictly older than this batch
   await new Promise(r => setTimeout(r, 350)); // respect rate limit
 }
 
@@ -115,4 +125,4 @@ const output = [
 ].join('\n');
 
 fs.writeFileSync('trades-history.js', output);
-console.log(`Done — ${unique.length} unique whale swaps (${trades.length} raw) | ${page} page(s) | ${totalScanned} total scanned`);
+console.log(`Done — ${unique.length} unique whale swaps (${trades.length} raw) | ${batch} batch(es) | ${totalScanned} total scanned`);
