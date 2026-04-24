@@ -82,7 +82,17 @@ while (true) {
   await new Promise(r => setTimeout(r, 350)); // respect rate limit
 }
 
-trades.sort((a, b) => b.ts - a.ts); // newest first
+// Deduplicate by tx hash — buy/sell beats transfer for the same tx
+const TYPE_RANK = { buy: 2, sell: 2, transfer: 1 };
+const deduped = new Map();
+for (const t of trades) {
+  const existing = deduped.get(t.hash);
+  if (!existing || TYPE_RANK[t.type] > TYPE_RANK[existing.type]) {
+    deduped.set(t.hash, t);
+  }
+}
+const unique = [...deduped.values()];
+unique.sort((a, b) => b.ts - a.ts); // newest first
 
 const now = new Date().toLocaleString('en-US', {
   year: 'numeric', month: 'long', day: 'numeric',
@@ -97,7 +107,7 @@ const output = [
   `const TRADES_LAST_UPDATED = "${now}";`,
   '',
   'const TRADES_HISTORY = [',
-  trades.map(t =>
+  unique.map(t =>
     `  { hash: "${t.hash}", ts: ${t.ts}, type: "${t.type}", inx: ${t.inx} }`
   ).join(',\n'),
   '];',
@@ -105,4 +115,4 @@ const output = [
 ].join('\n');
 
 fs.writeFileSync('trades-history.js', output);
-console.log(`Done — ${trades.length} whale swaps written | ${page} page(s) | ${totalScanned} total scanned`);
+console.log(`Done — ${unique.length} unique whale swaps (${trades.length} raw) | ${page} page(s) | ${totalScanned} total scanned`);
