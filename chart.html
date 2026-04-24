@@ -100,7 +100,24 @@
             color: var(--text-secondary);
             font-size: 14px;
             font-family: var(--font-mono);
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
         }
+        #chart-error.visible { display: flex; }
+        .retry-btn {
+            padding: 9px 20px;
+            border-radius: 100px;
+            border: 1px solid rgba(247,107,28,0.4);
+            background: rgba(247,107,28,0.08);
+            color: var(--accent-color);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+        .retry-btn:hover { background: rgba(247,107,28,0.16); }
 
         /* ── Chart legend ── */
         .chart-legend {
@@ -436,7 +453,10 @@
                     <div id="chart"></div>
                     <div id="popup"></div>
                 </div>
-                <div id="chart-error">Failed to load chart data. Please try again.</div>
+                <div id="chart-error">
+                    <span>Failed to load chart data.</span>
+                    <button class="retry-btn" id="retryBtn">↺ Retry</button>
+                </div>
 
                 <div class="chart-legend" id="chartLegend">
                     <div class="leg"><div class="leg-dot" style="background:#F76B1C"></div>B = Whale Buy</div>
@@ -515,8 +535,19 @@
     const legendEl = document.getElementById('chartLegend');
 
     const chartEl = document.getElementById('chart');
+
+    // Use explicit dimensions — do NOT use autoSize:true.
+    // autoSize owns the canvas internally via its own ResizeObserver, which
+    // conflicts with our manual applyOptions calls and can leave mobile at 0×0.
+    function resizeChart() {
+        const w = wrap.clientWidth;
+        const h = wrap.clientHeight;
+        if (w > 0 && h > 0) chart.applyOptions({ width: w, height: h });
+    }
+
     const chart = LightweightCharts.createChart(chartEl, {
-        autoSize: true,
+        width:  wrap.clientWidth  || 400,
+        height: wrap.clientHeight || 340,
         layout: {
             background: { type: 'solid', color: '#000' },
             textColor: '#666',
@@ -535,12 +566,8 @@
         timeScale: { borderColor: '#1a1a1a', timeVisible: true, secondsVisible: false },
     });
 
-    // Belt-and-suspenders: if autoSize fired at 0×0 (mobile flex not yet settled),
-    // manually correct dimensions whenever wrap is resized.
-    new ResizeObserver(entries => {
-        const { width, height } = entries[0].contentRect;
-        if (width > 0 && height > 0) chart.applyOptions({ width, height });
-    }).observe(wrap);
+    new ResizeObserver(resizeChart).observe(wrap);
+    window.addEventListener('resize', resizeChart);
 
     const series = chart.addSeries(LightweightCharts.CandlestickSeries, {
         upColor:       '#F76B1C',
@@ -627,19 +654,16 @@
                 .map(item => ({ time: item[0], open: +item[1], high: +item[2], low: +item[3], close: +item[4] }));
 
             series.setData(currentCandles);
-            // After async fetch, layout is guaranteed settled — force correct canvas size.
-            // This fixes mobile where autoSize may have initialised at 0×0.
-            const w = wrap.clientWidth, h = wrap.clientHeight;
-            if (w > 0 && h > 0) chart.applyOptions({ width: w, height: h });
+            // Force correct canvas size — layout is fully settled by the time data arrives.
+            resizeChart();
             clearMarker();
             buildMarkerMap();
-            // fitContent runs on next frame so LWC has processed the dimension update first.
             requestAnimationFrame(() => chart.timeScale().fitContent());
-            wrap.style.display    = '';
-            errorEl.style.display = 'none';
+            wrap.style.display = '';
+            errorEl.classList.remove('visible');
         } catch {
-            wrap.style.display    = 'none';
-            errorEl.style.display = 'block';
+            wrap.style.display = 'none';
+            errorEl.classList.add('visible');
             legendEl.style.display = 'none';
         }
     }
@@ -848,6 +872,12 @@
         clearMarker();
         chart.timeScale().fitContent();
         popup.style.display = 'none';
+    });
+
+    document.getElementById('retryBtn').addEventListener('click', () => {
+        errorEl.classList.remove('visible');
+        wrap.style.display = '';
+        loadChart(currentTf, currentAgg);
     });
 
     // ── Time filter buttons ──────────────────────────────
