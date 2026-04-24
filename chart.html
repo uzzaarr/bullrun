@@ -516,8 +516,7 @@
 
     const chartEl = document.getElementById('chart');
     const chart = LightweightCharts.createChart(chartEl, {
-        width:  wrap.clientWidth  || window.innerWidth - 24,
-        height: wrap.clientHeight || 540,
+        autoSize: true,
         layout: {
             background: { type: 'solid', color: '#000' },
             textColor: '#666',
@@ -536,9 +535,11 @@
         timeScale: { borderColor: '#1a1a1a', timeVisible: true, secondsVisible: false },
     });
 
-    new ResizeObserver(() => {
-        if (wrap.clientWidth > 0)
-            chart.applyOptions({ width: wrap.clientWidth, height: wrap.clientHeight });
+    // Belt-and-suspenders: if autoSize fired at 0×0 (mobile flex not yet settled),
+    // manually correct dimensions whenever wrap is resized.
+    new ResizeObserver(entries => {
+        const { width, height } = entries[0].contentRect;
+        if (width > 0 && height > 0) chart.applyOptions({ width, height });
     }).observe(wrap);
 
     const series = chart.addSeries(LightweightCharts.CandlestickSeries, {
@@ -626,9 +627,14 @@
                 .map(item => ({ time: item[0], open: +item[1], high: +item[2], low: +item[3], close: +item[4] }));
 
             series.setData(currentCandles);
+            // After async fetch, layout is guaranteed settled — force correct canvas size.
+            // This fixes mobile where autoSize may have initialised at 0×0.
+            const w = wrap.clientWidth, h = wrap.clientHeight;
+            if (w > 0 && h > 0) chart.applyOptions({ width: w, height: h });
             clearMarker();
             buildMarkerMap();
-            chart.timeScale().fitContent();
+            // fitContent runs on next frame so LWC has processed the dimension update first.
+            requestAnimationFrame(() => chart.timeScale().fitContent());
             wrap.style.display    = '';
             errorEl.style.display = 'none';
         } catch {
