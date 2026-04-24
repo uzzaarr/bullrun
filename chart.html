@@ -92,6 +92,23 @@
         }
         #chart { width: 100%; height: 100%; }
 
+        /* ── Mobile chart fallback ── */
+        #mobile-chart {
+            display: none;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            background: #000;
+            height: 420px;
+        }
+        #mobile-chart iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
         /* ── Chart error ── */
         #chart-error {
             display: none;
@@ -395,6 +412,11 @@
             .interval-bar { gap: 4px; }
             .iv-btn { padding: 6px 11px; font-size: 11px; }
             .iv-reset { padding: 6px 10px; font-size: 10px; }
+            #mobile-chart   { display: block; }
+            #chart-wrap     { display: none !important; }
+            .interval-bar   { display: none; }
+            #chart-error    { display: none !important; }
+            .chart-legend   { display: none !important; }
         }
     </style>
 </head>
@@ -453,6 +475,15 @@
                     <div id="chart"></div>
                     <div id="popup"></div>
                 </div>
+                <div id="mobile-chart">
+                    <iframe
+                        src="https://dexscreener.com/ethereum/0xdb66b18431f00e001867c67c6022c36205abec136381cd0d3fa58068ec88ace6?embed=1&theme=dark&trades=0&info=0"
+                        title="INX/USD mobile chart"
+                        allowfullscreen
+                        loading="lazy">
+                    </iframe>
+                </div>
+
                 <div id="chart-error">
                     <span>Failed to load chart data.</span>
                     <button class="retry-btn" id="retryBtn">↺ Retry</button>
