@@ -83,12 +83,12 @@
         /* ── Chart card ── */
         #chart-wrap {
             position: relative;
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 0 1px rgba(247,107,28,0.08), var(--card-shadow);
             background: #000;
-            height: 540px;
+            height: 620px;
         }
         #chart { width: 100%; height: 100%; }
 
@@ -723,31 +723,34 @@
         height: wrap.clientHeight || 340,
         layout: {
             background: { type: 'solid', color: '#000' },
-            textColor: '#666',
+            textColor: '#888',
             fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 10,
         },
         grid: {
-            vertLines: { color: '#111' },
-            horzLines: { color: '#111' },
+            vertLines: { color: '#161616' },
+            horzLines: { color: '#161616' },
         },
         crosshair: {
             mode: LightweightCharts.CrosshairMode.Magnet,
-            vertLine: { color: 'rgba(247,107,28,0.4)', labelBackgroundColor: '#F76B1C' },
-            horzLine: { color: 'rgba(247,107,28,0.4)', labelBackgroundColor: '#F76B1C' },
+            vertLine: { color: 'rgba(247,107,28,0.35)', labelBackgroundColor: '#1a1a1a' },
+            horzLine: { color: 'rgba(247,107,28,0.35)', labelBackgroundColor: '#1a1a1a' },
         },
-        rightPriceScale: { borderColor: '#1a1a1a' },
-        timeScale: { borderColor: '#1a1a1a', timeVisible: true, secondsVisible: false },
+        rightPriceScale: { borderColor: '#222' },
+        timeScale: { borderColor: '#222', timeVisible: true, secondsVisible: false },
     });
 
     new ResizeObserver(resizeChart).observe(wrap);
     window.addEventListener('resize', resizeChart);
 
     const series = chart.addSeries(LightweightCharts.CandlestickSeries, {
-        upColor:       '#F76B1C',
-        downColor:     '#333',
-        borderVisible: false,
-        wickUpColor:   '#F76B1C',
-        wickDownColor: '#555',
+        upColor:          '#F76B1C',
+        downColor:        '#5a5a6e',
+        borderVisible:    true,
+        borderUpColor:    '#F76B1C',
+        borderDownColor:  '#6e6e80',
+        wickUpColor:      '#F76B1C',
+        wickDownColor:    '#8888a0',
     });
 
     // ── Trade helpers ────────────────────────────────────
