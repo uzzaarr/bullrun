@@ -366,9 +366,17 @@
 
         /* Mobile stack */
         @media (max-width: 900px) {
+            .chart-container { padding: 16px 12px 30px; }
             .chart-layout { flex-direction: column; }
-            .feed-card { height: 480px; }
-            #chart-wrap { height: 400px; }
+            .feed-card { height: 420px; }
+            #chart-wrap { height: 340px; }
+            .sonar-header { margin-bottom: 16px !important; }
+            .sonar-header .logo-wrapper { display: none; }
+            .sonar-header h1 { font-size: 28px !important; }
+            .sonar-header .subtitle { font-size: 12px; }
+            .interval-bar { gap: 4px; }
+            .iv-btn { padding: 6px 11px; font-size: 11px; }
+            .iv-reset { padding: 6px 10px; font-size: 10px; }
         }
     </style>
 </head>
@@ -505,8 +513,10 @@
     const errorEl = document.getElementById('chart-error');
     const legendEl = document.getElementById('chartLegend');
 
-    const chart = LightweightCharts.createChart(document.getElementById('chart'), {
-        autoSize: true,
+    const chartEl = document.getElementById('chart');
+    const chart = LightweightCharts.createChart(chartEl, {
+        width:  wrap.clientWidth  || window.innerWidth - 24,
+        height: wrap.clientHeight || 540,
         layout: {
             background: { type: 'solid', color: '#000' },
             textColor: '#666',
@@ -524,6 +534,11 @@
         rightPriceScale: { borderColor: '#1a1a1a' },
         timeScale: { borderColor: '#1a1a1a', timeVisible: true, secondsVisible: false },
     });
+
+    new ResizeObserver(() => {
+        if (wrap.clientWidth > 0)
+            chart.applyOptions({ width: wrap.clientWidth, height: wrap.clientHeight });
+    }).observe(wrap);
 
     const series = chart.addSeries(LightweightCharts.CandlestickSeries, {
         upColor:       '#F76B1C',
@@ -572,16 +587,12 @@
         ).time;
     }
 
-    function buildAndApplyMarkers() {
+    // Silently builds markerMap (for chart-click popup) — no visual markers
+    function buildMarkerMap() {
         markerMap = new Map();
-        if (!currentCandles.length || !allTrades.length) {
-            if (markersPlugin) markersPlugin.setMarkers([]);
-            return;
-        }
-
+        if (!currentCandles.length || !allTrades.length) return;
         const start = currentCandles[0].time;
         const end   = currentCandles[currentCandles.length - 1].time;
-
         for (const t of allTrades) {
             const ts = Math.floor(new Date(t.attributes.block_timestamp).getTime() / 1000);
             if (ts < start || ts > end) continue;
@@ -589,22 +600,12 @@
             if (!markerMap.has(snapped)) markerMap.set(snapped, []);
             markerMap.get(snapped).push(t);
         }
+    }
 
-        const markers = [];
-        for (const [time, txs] of markerMap) {
-            const hasBuy  = txs.some(t => isBuy(t));
-            const hasSell = txs.some(t => !isBuy(t));
-            if (hasBuy)  markers.push({ time, position: 'belowBar', color: '#F76B1C', shape: 'arrowUp',   text: 'B' });
-            if (hasSell) markers.push({ time, position: 'aboveBar', color: '#555',    shape: 'arrowDown', text: 'S' });
-        }
-        markers.sort((a, b) => a.time - b.time);
-
-        if (markersPlugin) {
-            markersPlugin.setMarkers(markers);
-        } else {
-            markersPlugin = LightweightCharts.createSeriesMarkers(series, markers);
-        }
-        legendEl.style.display = markers.length ? 'flex' : 'none';
+    function clearMarker() {
+        activeFocusTime = null;
+        if (markersPlugin) markersPlugin.setMarkers([]);
+        legendEl.style.display = 'none';
     }
 
     // ── Chart data ───────────────────────────────────────
@@ -624,7 +625,8 @@
                 .map(item => ({ time: item[0], open: +item[1], high: +item[2], low: +item[3], close: +item[4] }));
 
             series.setData(currentCandles);
-            buildAndApplyMarkers();
+            clearMarker();
+            buildMarkerMap();
             chart.timeScale().fitContent();
             wrap.style.display    = '';
             errorEl.style.display = 'none';
@@ -756,8 +758,7 @@
             if (!snapped) return;
 
             if (activeFocusTime === snapped) {
-                activeFocusTime = null;
-                buildAndApplyMarkers();
+                clearMarker();
                 chart.timeScale().fitContent();
                 return;
             }
@@ -780,6 +781,7 @@
             } else {
                 markersPlugin = LightweightCharts.createSeriesMarkers(series, [focusMarker]);
             }
+            legendEl.style.display = 'flex';
             chart.timeScale().setVisibleRange({
                 from: snapped - aggSecs * 12,
                 to:   snapped + aggSecs * 12,
@@ -820,7 +822,7 @@
                 catch { return false; }
             });
             renderFeed();
-            buildAndApplyMarkers();
+            buildMarkerMap();
         } catch { /* keep stale data */ }
     }
 
@@ -836,8 +838,7 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
-        activeFocusTime = null;
-        buildAndApplyMarkers();
+        clearMarker();
         chart.timeScale().fitContent();
         popup.style.display = 'none';
     });
