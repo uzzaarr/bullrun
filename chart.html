@@ -14,7 +14,7 @@
     <style>
         /* ── Wide container for two-column layout ── */
         .chart-container {
-            max-width: 1280px;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 60px 24px 40px;
         }
@@ -26,15 +26,15 @@
             align-items: flex-start;
         }
         .chart-col {
-            flex: 6;
+            flex: 7;
             min-width: 0;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
         .feed-col {
-            flex: 4;
-            min-width: 0;
+            flex: 3;
+            min-width: 280px;
         }
 
         /* ── Interval bar ── */
@@ -233,13 +233,12 @@
             letter-spacing: 1px;
         }
 
-        /* Time filter */
-        .time-filter {
+        /* ── Range trigger button ── */
+        .range-trigger {
             display: flex;
+            align-items: center;
             gap: 5px;
-        }
-        .tf-preset {
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 100px;
             border: 1px solid var(--border-color);
             color: var(--text-tertiary);
@@ -250,13 +249,114 @@
             cursor: pointer;
             transition: all 0.2s ease;
             letter-spacing: 0.5px;
+            white-space: nowrap;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .tf-preset:hover { border-color: rgba(247,107,28,0.3); color: var(--text-secondary); }
-        .tf-preset.active {
-            border-color: var(--accent-color);
+        .range-trigger:hover { border-color: rgba(247,107,28,0.3); color: var(--text-secondary); }
+        .range-trigger.has-range {
+            border-color: rgba(247,107,28,0.5);
             color: var(--accent-color);
             background: rgba(247,107,28,0.06);
         }
+
+        /* ── Range modal ── */
+        .range-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .range-modal.hidden { display: none; }
+        .range-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.75); }
+        .range-dialog {
+            position: relative; z-index: 1;
+            background: #0d0d0d;
+            border: 1px solid #222;
+            border-radius: 16px;
+            padding: 20px;
+            width: 560px;
+            max-width: calc(100vw - 32px);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.85);
+        }
+        .range-tops { display: flex; gap: 10px; margin-bottom: 18px; }
+        .range-input-box {
+            flex: 1; background: #111; border: 1px solid #222; border-radius: 10px;
+            padding: 10px 14px; cursor: pointer; transition: border-color 0.2s;
+        }
+        .range-input-box.active { border-color: var(--accent-color); background: rgba(247,107,28,0.05); }
+        .ri-label {
+            font-size: 9px; font-family: var(--font-mono); font-weight: 700;
+            letter-spacing: 1.5px; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 4px;
+        }
+        .ri-val { font-size: 13px; font-family: var(--font-mono); font-weight: 700; color: var(--text-primary); }
+        .range-input-box.active .ri-val { color: var(--accent-color); }
+        .range-body { display: flex; gap: 16px; margin-bottom: 18px; }
+        .range-cal { flex: 1; }
+        .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .cal-nav-btn {
+            background: none; border: none; color: var(--text-secondary);
+            font-size: 20px; cursor: pointer; padding: 0 6px; line-height: 1; border-radius: 6px;
+        }
+        .cal-nav-btn:hover { color: var(--text-primary); }
+        #calTitle { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--text-primary); }
+        .cal-days-header {
+            display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 4px;
+        }
+        .cal-days-header span {
+            text-align: center; font-family: var(--font-mono); font-size: 9px;
+            color: var(--text-tertiary); letter-spacing: 0.5px; padding: 3px 0;
+        }
+        #calGrid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+        .cal-cell {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono); font-size: 12px; color: var(--text-primary);
+            background: none; border: none; border-radius: 50%; cursor: pointer; transition: all 0.12s;
+        }
+        .cal-cell:hover:not(.other-month) { background: rgba(255,255,255,0.08); }
+        .cal-cell.other-month { color: #2a2a2a; cursor: default; pointer-events: none; }
+        .cal-cell.sel-from, .cal-cell.sel-to {
+            background: var(--accent-color) !important; color: #000; font-weight: 800; border-radius: 50%;
+        }
+        .cal-cell.in-range { background: rgba(247,107,28,0.12); border-radius: 0; }
+
+        /* ── Time picker ── */
+        .range-timepick { width: 100px; display: flex; flex-direction: column; }
+        .rtp-label {
+            font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.5px;
+            color: var(--text-tertiary); text-transform: uppercase; text-align: center; margin-bottom: 8px;
+        }
+        .rtp-lists { display: flex; gap: 4px; align-items: flex-start; }
+        .rtp-colon { font-family: var(--font-mono); font-size: 16px; color: var(--text-tertiary); padding-top: 6px; }
+        .rtp-scroll {
+            flex: 1; height: 190px; overflow-y: auto; scrollbar-width: none;
+            display: flex; flex-direction: column; gap: 1px;
+        }
+        .rtp-scroll::-webkit-scrollbar { display: none; }
+        .rtp-item {
+            padding: 5px 0; text-align: center; font-family: var(--font-mono); font-size: 12px;
+            color: var(--text-tertiary); background: none; border: none; border-radius: 5px;
+            cursor: pointer; transition: all 0.12s; flex-shrink: 0;
+        }
+        .rtp-item:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .rtp-item.active { color: var(--accent-color); font-weight: 700; background: rgba(247,107,28,0.1); }
+
+        /* ── Modal footer ── */
+        .range-footer { display: flex; align-items: center; justify-content: space-between; }
+        .range-footer-right { display: flex; gap: 8px; align-items: center; }
+        #rangeReset {
+            background: none; border: none; color: var(--text-tertiary);
+            font-family: var(--font-mono); font-size: 11px; cursor: pointer; padding: 0; letter-spacing: 0.3px;
+        }
+        #rangeReset:hover { color: var(--text-primary); }
+        #rangeCancel {
+            background: none; border: none; color: var(--text-secondary);
+            font-family: var(--font-mono); font-size: 11px; cursor: pointer; padding: 7px 12px;
+        }
+        #rangeCancel:hover { color: var(--text-primary); }
+        .range-apply-btn {
+            padding: 9px 18px; border-radius: 100px; border: none;
+            background: var(--accent-color); color: #000;
+            font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+            cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s;
+        }
+        .range-apply-btn:hover { background: var(--accent-hover); }
 
         /* Feed list */
         .feed-list {
@@ -505,13 +605,9 @@
                             Whale Feed
                             <span class="feed-threshold">&gt; 100k INX</span>
                         </div>
-                        <div class="time-filter" id="timeFilter">
-                            <button class="tf-preset" data-hours="1">1H</button>
-                            <button class="tf-preset" data-hours="6">6H</button>
-                            <button class="tf-preset active" data-hours="24">24H</button>
-                            <button class="tf-preset" data-hours="168">7D</button>
-                            <button class="tf-preset" data-hours="0">All</button>
-                        </div>
+                        <button class="range-trigger" id="rangeBtn">
+                            ⏱ <span id="rangeBtnText">All Time</span> ▾
+                        </button>
                     </div>
                     <div class="feed-list" id="feedList"></div>
                 </div>
@@ -529,16 +625,62 @@
         <a href="https://x.com/MazinoTower" target="_blank" rel="noopener">@MazinoTower</a>
     </footer>
 
+    <!-- ── Date range picker modal ── -->
+    <div id="rangeModal" class="range-modal hidden">
+        <div class="range-backdrop" id="rangeBackdrop"></div>
+        <div class="range-dialog">
+            <div class="range-tops">
+                <div class="range-input-box active" id="tabFrom">
+                    <div class="ri-label">FROM</div>
+                    <div class="ri-val" id="fromDisplay">—</div>
+                </div>
+                <div class="range-input-box" id="tabTo">
+                    <div class="ri-label">TO</div>
+                    <div class="ri-val" id="toDisplay">—</div>
+                </div>
+            </div>
+            <div class="range-body">
+                <div class="range-cal">
+                    <div class="cal-nav">
+                        <button class="cal-nav-btn" id="calPrev">‹</button>
+                        <span id="calTitle"></span>
+                        <button class="cal-nav-btn" id="calNext">›</button>
+                    </div>
+                    <div class="cal-days-header">
+                        <span>SU</span><span>MO</span><span>TU</span><span>WE</span><span>TH</span><span>FR</span><span>SA</span>
+                    </div>
+                    <div id="calGrid"></div>
+                </div>
+                <div class="range-timepick">
+                    <div class="rtp-label">Time</div>
+                    <div class="rtp-lists">
+                        <div class="rtp-scroll" id="hourList"></div>
+                        <div class="rtp-colon">:</div>
+                        <div class="rtp-scroll" id="minList"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="range-footer">
+                <button id="rangeReset">Reset Filter</button>
+                <div class="range-footer-right">
+                    <button id="rangeCancel">Cancel</button>
+                    <button id="rangeApply" class="range-apply-btn">Apply Range</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
     // ── Constants ────────────────────────────────────────
     const INX_CA    = '0xdef1b2d939edc0e4d35806c59b3166f790175afe';
     const MIN_WHALE = 100_000;
 
     // ── State ────────────────────────────────────────────
-    let currentCandles  = [];       // [{time,open,high,low,close}]
-    let allTrades       = [];       // whale trades from GeckoTerminal
-    let activeHours     = 24;       // time filter preset
-    let markerMap       = new Map();// snapped_time → [trade, ...]
+    let currentCandles  = [];
+    let allTrades       = [];
+    let rangeFrom       = null;     // ms timestamp or null
+    let rangeTo         = null;     // ms timestamp or null
+    let markerMap       = new Map();
     let markersPlugin   = null;
     let activeFocusTime = null;     // candle time of zoomed marker
     let currentTf       = 'hour';
@@ -755,9 +897,13 @@
 
     // ── Whale feed ───────────────────────────────────────
     function filteredTrades() {
-        if (!activeHours) return allTrades;
-        const cutoff = Date.now() - activeHours * 3_600_000;
-        return allTrades.filter(t => new Date(t.attributes.block_timestamp).getTime() >= cutoff);
+        if (!rangeFrom && !rangeTo) return allTrades;
+        return allTrades.filter(t => {
+            const ts = new Date(t.attributes.block_timestamp).getTime();
+            if (rangeFrom && ts < rangeFrom) return false;
+            if (rangeTo   && ts > rangeTo)   return false;
+            return true;
+        });
     }
 
     function createTradeCard(t) {
@@ -911,14 +1057,149 @@
         loadChart(currentTf, currentAgg);
     });
 
-    // ── Time filter buttons ──────────────────────────────
-    document.querySelectorAll('.tf-preset').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tf-preset').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            activeHours = parseInt(btn.dataset.hours);
-            renderFeed();
-        });
+    // ── Date range picker ────────────────────────────────
+    const MONTHS = ['January','February','March','April','May','June','July',
+                    'August','September','October','November','December'];
+    let tmpFromDate = null, tmpToDate = null;
+    let tmpFromH = 0, tmpFromM = 0, tmpToH = 23, tmpToM = 59;
+    let pickerSide = 'from';
+    let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
+
+    function fmtPickerDate(d, h, m) {
+        if (!d) return '—';
+        const dy = String(d.getDate()).padStart(2,'0');
+        const hr = String(h).padStart(2,'0');
+        const mn = String(m).padStart(2,'0');
+        return MONTHS[d.getMonth()].slice(0,3) + ' ' + dy + ', ' + hr + ':' + mn;
+    }
+
+    function updateRangeDisplays() {
+        document.getElementById('fromDisplay').textContent = fmtPickerDate(tmpFromDate, tmpFromH, tmpFromM);
+        document.getElementById('toDisplay').textContent   = fmtPickerDate(tmpToDate,   tmpToH,   tmpToM);
+        document.getElementById('tabFrom').classList.toggle('active', pickerSide === 'from');
+        document.getElementById('tabTo').classList.toggle('active',   pickerSide === 'to');
+    }
+
+    function buildCalendar() {
+        document.getElementById('calTitle').textContent = MONTHS[calMonth] + ' ' + calYear;
+        const grid = document.getElementById('calGrid');
+        grid.textContent = '';
+        const firstDay    = new Date(calYear, calMonth, 1).getDay();
+        const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+        const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+        let day = 1, nextDay = 1;
+        for (let i = 0; i < 42; i++) {
+            const cell = document.createElement('button');
+            cell.className = 'cal-cell';
+            if (i < firstDay) {
+                cell.textContent = daysInPrev - firstDay + 1 + i;
+                cell.classList.add('other-month');
+            } else if (day <= daysInMonth) {
+                cell.textContent = day;
+                const d = new Date(calYear, calMonth, day);
+                if (tmpFromDate && d.toDateString() === tmpFromDate.toDateString()) cell.classList.add('sel-from');
+                if (tmpToDate   && d.toDateString() === tmpToDate.toDateString())   cell.classList.add('sel-to');
+                if (tmpFromDate && tmpToDate && d > tmpFromDate && d < tmpToDate)   cell.classList.add('in-range');
+                cell.addEventListener('click', () => {
+                    const sel = new Date(calYear, calMonth, parseInt(cell.textContent));
+                    if (pickerSide === 'from') {
+                        tmpFromDate = sel; tmpToDate = null; pickerSide = 'to';
+                    } else {
+                        if (tmpFromDate && sel < tmpFromDate) {
+                            tmpToDate = tmpFromDate; tmpFromDate = sel;
+                        } else { tmpToDate = sel; }
+                    }
+                    buildCalendar(); buildTimeLists(); updateRangeDisplays();
+                });
+                day++;
+            } else {
+                cell.textContent = nextDay++; cell.classList.add('other-month');
+            }
+            grid.appendChild(cell);
+        }
+    }
+
+    function buildTimeLists() {
+        const curH = pickerSide === 'from' ? tmpFromH : tmpToH;
+        const curM = pickerSide === 'from' ? tmpFromM : tmpToM;
+        function buildList(el, count, selected, setter) {
+            el.textContent = '';
+            for (let i = 0; i < count; i++) {
+                const item = document.createElement('button');
+                item.className = 'rtp-item' + (i === selected ? ' active' : '');
+                item.textContent = String(i).padStart(2,'0');
+                item.addEventListener('click', () => {
+                    setter(i); buildTimeLists(); updateRangeDisplays();
+                });
+                el.appendChild(item);
+            }
+            const active = el.querySelector('.rtp-item.active');
+            if (active) setTimeout(() => active.scrollIntoView({ block: 'center', behavior: 'smooth' }), 0);
+        }
+        if (pickerSide === 'from') {
+            buildList(document.getElementById('hourList'), 24, curH, v => tmpFromH = v);
+            buildList(document.getElementById('minList'),  60, curM, v => tmpFromM = v);
+        } else {
+            buildList(document.getElementById('hourList'), 24, curH, v => tmpToH = v);
+            buildList(document.getElementById('minList'),  60, curM, v => tmpToM = v);
+        }
+    }
+
+    function openRangeModal() {
+        const now = new Date();
+        if (rangeFrom) {
+            const d = new Date(rangeFrom);
+            tmpFromDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            tmpFromH = d.getHours(); tmpFromM = d.getMinutes();
+        } else {
+            const d = new Date(now); d.setDate(d.getDate() - 1);
+            tmpFromDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            tmpFromH = 0; tmpFromM = 0;
+        }
+        if (rangeTo) {
+            const d = new Date(rangeTo);
+            tmpToDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            tmpToH = d.getHours(); tmpToM = d.getMinutes();
+        } else {
+            tmpToDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            tmpToH = 23; tmpToM = 59;
+        }
+        pickerSide = 'from';
+        calYear = tmpFromDate.getFullYear(); calMonth = tmpFromDate.getMonth();
+        buildCalendar(); buildTimeLists(); updateRangeDisplays();
+        document.getElementById('rangeModal').classList.remove('hidden');
+    }
+
+    function closeRangeModal() {
+        document.getElementById('rangeModal').classList.add('hidden');
+    }
+
+    document.getElementById('rangeBtn').addEventListener('click', openRangeModal);
+    document.getElementById('rangeBackdrop').addEventListener('click', closeRangeModal);
+    document.getElementById('rangeCancel').addEventListener('click', closeRangeModal);
+    document.getElementById('tabFrom').addEventListener('click', () => { pickerSide = 'from'; updateRangeDisplays(); buildTimeLists(); });
+    document.getElementById('tabTo').addEventListener('click',   () => { pickerSide = 'to';   updateRangeDisplays(); buildTimeLists(); });
+    document.getElementById('calPrev').addEventListener('click', () => {
+        calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } buildCalendar();
+    });
+    document.getElementById('calNext').addEventListener('click', () => {
+        calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } buildCalendar();
+    });
+    document.getElementById('rangeReset').addEventListener('click', () => {
+        rangeFrom = null; rangeTo = null;
+        document.getElementById('rangeBtn').classList.remove('has-range');
+        document.getElementById('rangeBtnText').textContent = 'All Time';
+        closeRangeModal(); renderFeed();
+    });
+    document.getElementById('rangeApply').addEventListener('click', () => {
+        if (!tmpFromDate || !tmpToDate) return;
+        const from = new Date(tmpFromDate); from.setHours(tmpFromH, tmpFromM, 0, 0);
+        const to   = new Date(tmpToDate);   to.setHours(tmpToH, tmpToM, 59, 999);
+        rangeFrom = from.getTime(); rangeTo = to.getTime();
+        document.getElementById('rangeBtn').classList.add('has-range');
+        document.getElementById('rangeBtnText').textContent =
+            fmtPickerDate(tmpFromDate, tmpFromH, tmpFromM) + ' → ' + fmtPickerDate(tmpToDate, tmpToH, tmpToM);
+        closeRangeModal(); renderFeed();
     });
 
     // ── Init ─────────────────────────────────────────────
