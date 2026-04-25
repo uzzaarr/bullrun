@@ -16,12 +16,10 @@
 
     <div class="loader-screen" id="loaderScreen">
         <div class="loader-content">
-            <div class="loader-logo">
-                <img src="./icons/Infinex_Logo_Cantaloupe.svg" alt="Infinex Logo">
-                <div class="loader-glow"></div>
-            </div>
-            <div class="loader-bar">
-                <div class="loader-progress" id="loaderProgress"></div>
+            <div class="loader-track">
+                <div class="loader-progress" id="loaderProgress">
+                    <img class="loader-bull" src="./image__2_-removebg-preview.png" alt="">
+                </div>
             </div>
         </div>
     </div>
@@ -134,19 +132,17 @@
         let progress = 0;
 
         function updateLoader() {
-            progress += Math.random() * 15 + 5;
+            progress += Math.random() * 6 + 2;
             if (progress > 100) progress = 100;
             loaderProgress.style.width = progress + '%';
-            
+
             if (progress < 100) {
-                setTimeout(updateLoader, 150);
+                setTimeout(updateLoader, 80);
             } else {
                 setTimeout(() => {
                     loaderScreen.classList.add('fade-out');
-                    setTimeout(() => {
-                        loaderScreen.style.display = 'none';
-                    }, 500);
-                }, 300);
+                    setTimeout(() => loaderScreen.style.display = 'none', 600);
+                }, 200);
             }
         }
 
