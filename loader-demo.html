@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loader Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #F76B1C;
+            --glow: rgba(247, 107, 28, 0.4);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #000;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Barlow', sans-serif;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(247,107,28,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(247,107,28,0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .loader-scene {
+            position: relative;
+            width: 360px;
+            margin-top: 72px;
+        }
+
+        .loader-track {
+            position: relative;
+            width: 290px;
+            height: 4px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 2px;
+        }
+
+        .loader-fill {
+            position: relative;
+            height: 100%;
+            width: 0%;
+            min-width: 16px;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 14px var(--glow);
+            overflow: visible;
+        }
+
+        .loader-bull {
+            position: absolute;
+            right: -32px;
+            bottom: 6px;
+            width: 72px;
+            height: auto;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.7));
+            animation: bullBounce 0.45s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+            pointer-events: none;
+        }
+
+        @keyframes bullBounce {
+            0%, 100% { transform: scaleX(-1) translateY(0px)  rotate(0deg); }
+            50%       { transform: scaleX(-1) translateY(-6px) rotate(-1.5deg); }
+        }
+
+        .replay-btn {
+            margin-top: 56px;
+            padding: 10px 30px;
+            background: transparent;
+            border: 1px solid rgba(247,107,28,0.4);
+            border-radius: 100px;
+            color: var(--accent);
+            font-family: 'Barlow', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .replay-btn:hover {
+            background: rgba(247,107,28,0.08);
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+<div class="loader-content">
+    <div class="loader-scene">
+        <div class="loader-track">
+            <div class="loader-fill" id="loaderFill">
+                <img class="loader-bull" src="./icons/bull.png" alt="">
+            </div>
+        </div>
+    </div>
+
+    <button class="replay-btn" onclick="replay()">Replay</button>
+</div>
+
+<script>
+    const fill = document.getElementById('loaderFill');
+    let pct = 0, timer = null;
+
+    function step() {
+        pct += Math.random() * 6 + 2;
+        if (pct > 100) pct = 100;
+        fill.style.width = pct + '%';
+        if (pct < 100) timer = setTimeout(step, 80);
+    }
+
+    function replay() {
+        clearTimeout(timer);
+        pct = 0;
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        requestAnimationFrame(() => {
+            fill.style.transition = 'width 0.18s ease';
+            setTimeout(step, 60);
+        });
+    }
+
+    step();
+</script>
+
+</body>
+</html>
