@@ -1,10 +1,18 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: May 8, 2026 at 02:23 PM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: May 8, 2026 at 07:55 PM UTC
 
-const TRADES_LAST_UPDATED = "May 8, 2026 at 02:23 PM UTC";
+const TRADES_LAST_UPDATED = "May 8, 2026 at 07:55 PM UTC";
 
 const TRADES_HISTORY = [
+  { hash: "0x255fd18cd29f78324ce3e8a0ba06ee84ab1f614195d020258dcddd1333d3d62c", ts: 1778259167, type: "buy", inx: 521018 },
+  { hash: "0x8312142b1c7ae56d092e141490e53d6e32efce595869ef972a3e5e1d3aabb162", ts: 1778259083, type: "buy", inx: 523427 },
+  { hash: "0x220b74410d81ab2d2dde43cb1130857e5189d7773bc935ef97835f4d94d9ae17", ts: 1778257811, type: "buy", inx: 104116 },
+  { hash: "0x447a862ac683f9ba7c2e196952c5e082dd4d6170f6f15e69a0d088872a4095b4", ts: 1778257811, type: "buy", inx: 104116 },
+  { hash: "0x8c4c69b4e751aaa44db741bcf215d52f7c5e7444cc3f4da4b90ebb8ed8959ee5", ts: 1778257811, type: "buy", inx: 104116 },
+  { hash: "0x8a384b39d61d9313131c8a315b9e72a77300ea87d786e2e3e58568c2041c61c3", ts: 1778253863, type: "sell", inx: 103926 },
+  { hash: "0xbe1e374b29c5f773543d746442061b2b481d68435e0556f143a9ef1b50f7c140", ts: 1778253863, type: "sell", inx: 103926 },
+  { hash: "0x678aacb57664adbabdf6e361738cc107c26caa4273eb7fb82c69bd7b1cdefbed", ts: 1778253191, type: "transfer", inx: 506301 },
   { hash: "0x6fecc4809b462491531a00be49e52214c64b1625b16db4f5da0f68a6cf4f8aa1", ts: 1778247983, type: "transfer", inx: 531082 },
   { hash: "0x486992eddaea483f3e56b74a1dd3a1c7c36614e18c61d7e0c919c7c2a3b42e45", ts: 1778245427, type: "sell", inx: 103735 },
   { hash: "0x1178f10515fcc21d21cecda4c2140bd9841410bbdf30434665152b7c853be8c4", ts: 1778245427, type: "sell", inx: 103735 },
@@ -5333,10 +5341,6 @@ const TRADES_HISTORY = [
   { hash: "0x7f1f90d579339e366d7fbe12570a8f24ab64c8b2522bb44ee452374630f44470", ts: 1776374975, type: "transfer", inx: 139425 },
   { hash: "0x1328dc8cb545f8587ad4f9328af1216b07f42eaecae785e36423a35b67dcc812", ts: 1776374855, type: "sell", inx: 118686 },
   { hash: "0x66da31ba593ec8ad7a34df2fcfcec3938a4f8f3ee17f400635254875f37720f2", ts: 1776374855, type: "sell", inx: 116160 },
-  { hash: "0x5d2c36e6577efbd5ec8cf945f61a117cdfcf84f4b67882a1a57ed4098ca1c723", ts: 1776374855, type: "transfer", inx: 116511 },
-  { hash: "0xb9463d16e673c001db39ee48453fe7f8a8cd6d77ea22e06a14880dbf70b5dab9", ts: 1776374855, type: "transfer", inx: 118687 },
-  { hash: "0xc08ec1e76c309028116899ff98dd496a910f33b970ea81c67ae58532d198a428", ts: 1776374855, type: "transfer", inx: 127610 },
-  { hash: "0xf0dd9dbb3d351b00d825aeedd00372b70b8e19542373df3c180961504fe4cac6", ts: 1776374855, type: "transfer", inx: 116161 },
   { hash: "0xc88156aeed06405abd6efd3ed0a6cb73605c7844e9e0b64e33e7d67115b33739", ts: 1776374831, type: "sell", inx: 127610 },
   { hash: "0x559d4390aef17a16af98f2875741a7b607391bfe0ffc8ffbfa8c6fd918b6e600", ts: 1776374831, type: "sell", inx: 116511 },
   { hash: "0x5f13d7fc480a571f53d7810ee61d04baa4ccfb4896376133f455e6e4610e1966", ts: 1776372851, type: "sell", inx: 132819 },
@@ -7005,7 +7009,6 @@ const TRADES_HISTORY = [
   { hash: "0x0a43f186b460fdf750dc1c67a5b71897d352140502c300b4a8cbec80ea2ee1dd", ts: 1776078527, type: "sell", inx: 100000 },
   { hash: "0x0a37871a4d5b70046c583daff26feb55d9dedbdbddef7648a507a386dcc04475", ts: 1776078395, type: "buy", inx: 100000 },
   { hash: "0xfa5e7f384281c5148d010c47c906c47865aefd7a51220e032548bc2c49618093", ts: 1776078275, type: "transfer", inx: 111957 },
-  { hash: "0x965e4ba7e62592b0ec6a4c4ef8955ef6648671f1605c18c5a80a74f2753dfb0a", ts: 1776078239, type: "sell", inx: 111957 },
   { hash: "0x9725355ac287077714a1fc599870e9252080922beb3f2840397ccfe1419ed6fc", ts: 1776078047, type: "transfer", inx: 5431043 },
   { hash: "0xf62b1419b580bfa6e67da4953cfa01f0da92f0fea741bb01a31820abc85147be", ts: 1776078047, type: "transfer", inx: 5035691 },
   { hash: "0x27505f662593af2b3338f37d8a9f8b19553b7b5055aa2e011880559a9353f6a7", ts: 1776078047, type: "transfer", inx: 3357128 },
