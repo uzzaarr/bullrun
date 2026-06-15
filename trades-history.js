@@ -1,10 +1,13 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: June 14, 2026 at 08:06 PM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: June 15, 2026 at 05:39 AM UTC
 
-const TRADES_LAST_UPDATED = "June 14, 2026 at 08:06 PM UTC";
+const TRADES_LAST_UPDATED = "June 15, 2026 at 05:39 AM UTC";
 
 const TRADES_HISTORY = [
+  { hash: "0x5d6ca99f6eaffbf4ab6813162f2c38f15d1989f31ad5e5833205739a528b1a19", ts: 1781478899, type: "transfer", inx: 130706 },
+  { hash: "0xa44f309f4679c440a1841a6c1008ba07fa7903e8d72a2b68e1ed2f0a21f22624", ts: 1781478887, type: "transfer", inx: 196968 },
+  { hash: "0x178e484465456f142841e5c3822717603fdc45ac5f54d2b04212c88c597c323f", ts: 1781478803, type: "transfer", inx: 130706 },
   { hash: "0x4b5f3951b55ccd48366857c18967ea4cc0f371c63172182035106cf2213100a0", ts: 1781449427, type: "transfer", inx: 143481 },
   { hash: "0x7035a6ac49b436aa4deab2cc0444a309ccee71b3a90031d00b5cc74ddbb0eeb4", ts: 1781448527, type: "transfer", inx: 143481 },
   { hash: "0x66249cb5520c847e6c0908e000619f58c1f51c6f061ed49ad96a1da6d82856ef", ts: 1781448299, type: "transfer", inx: 142169 },
@@ -10074,7 +10077,6 @@ const TRADES_HISTORY = [
   { hash: "0xf3758413196175bd8332ff7909a23b1eb6f6c09aa3e3ef2430deb25ff9084021", ts: 1778352431, type: "buy", inx: 124558 },
   { hash: "0x4418cf7b6670d231bae3e0ace570756b6b72f3dc8c154ff614fa8b4b6bb0575a", ts: 1778352419, type: "buy", inx: 121125 },
   { hash: "0x700d20ccf17c3d5fe6129b5dd724199a3e4e5e8b3171a3178c922c86a8b1da17", ts: 1778352407, type: "buy", inx: 106803 },
-  { hash: "0x26c25b33c6b9e47db9117be8cbfcbc0bc529015bd6d8d2461d8d064d6ba56209", ts: 1778352227, type: "sell", inx: 140715 },
   { hash: "0x7a8eed8b35ee600e69d17044b81151e9bc344f5447007d96fa4bc220affd73f3", ts: 1778352179, type: "buy", inx: 100000 },
   { hash: "0x6921fdad825a48c6f6368ad8fe7b9ff17b10d94a86e1b9526f6523d96f2b0295", ts: 1778352179, type: "buy", inx: 290303 },
   { hash: "0xcec31f0aa97eedadb49ba817b8d5231ee6fc5532bd4a4b18365183bf83a0bc71", ts: 1778352167, type: "sell", inx: 1116814 },
