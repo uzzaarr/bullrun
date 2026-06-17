@@ -1,10 +1,12 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: June 17, 2026 at 11:21 AM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: June 17, 2026 at 04:12 PM UTC
 
-const TRADES_LAST_UPDATED = "June 17, 2026 at 11:21 AM UTC";
+const TRADES_LAST_UPDATED = "June 17, 2026 at 04:12 PM UTC";
 
 const TRADES_HISTORY = [
+  { hash: "0x0a6a65f2e2e3b4325919b1b0f0731e6fd236262cc93bb41eceb7ffefeba959d6", ts: 1781698571, type: "transfer", inx: 168130 },
+  { hash: "0xed11a806707bdad7038b4ca47099da5de679936932139824399796f43fdb8a44", ts: 1781698571, type: "transfer", inx: 286356 },
   { hash: "0x6422fb9a63d1f15a3e545523a89a8ceac9a365a342f246242530548a88b7a04d", ts: 1781694863, type: "transfer", inx: 115068 },
   { hash: "0xef5809a108006ada2f0a0383543a8d0107fb0654eaba92dbf4ed657e4f5bd294", ts: 1781685119, type: "transfer", inx: 2575342 },
   { hash: "0x9369f0eb11291321c08a5d170f432164b59a5a237d59daa7940fa4b630d63707", ts: 1781684915, type: "transfer", inx: 2575342 },
@@ -10032,8 +10034,6 @@ const TRADES_HISTORY = [
   { hash: "0xf1a034dcb70722d4aafe41405511ec47a9c43df00f3eee0903465ce742b2529e", ts: 1778358131, type: "buy", inx: 1097458 },
   { hash: "0xc6437376e2413910aad90414104450e706dfabdeb13b4d0a1732c3f5df634f58", ts: 1778358119, type: "buy", inx: 100000 },
   { hash: "0x1e32b2a4fc20c6d5ceed87d0b0872a2b3dbae9b2ff62316345b26c10f2d393d1", ts: 1778358119, type: "buy", inx: 131686 },
-  { hash: "0x1241fc16a15b4f136e9f67cd6bc165edca0ced04d70cc75286bbb5fd37841346", ts: 1778358119, type: "buy", inx: 200000 },
-  { hash: "0x0a3a9a524e7c9c7d8fa6a89c32fc3371ce59d840b3a625f8ef88ad820a778690", ts: 1778358119, type: "buy", inx: 263908 },
   { hash: "0x4f52ec1a2b9330c905e8a37c323c2b4eb11ec5fa8e276d0351d38e60c21853fc", ts: 1778357939, type: "sell", inx: 100000 },
   { hash: "0x149d4f3a9478346b0f600a74485e18b23d7997c2b40fdedcd6635b06483bbc0a", ts: 1778357915, type: "transfer", inx: 108193 },
   { hash: "0xf7bd51c678eb4afccb2b4ca3b3ef55fd88cb777053f2379233aa740dd8396b19", ts: 1778357915, type: "transfer", inx: 1271840 },
