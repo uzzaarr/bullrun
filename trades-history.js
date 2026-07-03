@@ -1,8 +1,8 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: July 3, 2026 at 09:42 AM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: July 3, 2026 at 02:41 PM UTC
 
-const TRADES_LAST_UPDATED = "July 3, 2026 at 09:42 AM UTC";
+const TRADES_LAST_UPDATED = "July 3, 2026 at 02:41 PM UTC";
 
 const TRADES_HISTORY = [
   { hash: "0x8587e58b5d9fdc02b68e8c5b6117c19dc8be2862ee4eb7c849b68df45c994f19", ts: 1782401951, type: "transfer", inx: 500004 },
