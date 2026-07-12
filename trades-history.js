@@ -1,8 +1,8 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: July 11, 2026 at 07:41 PM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: July 12, 2026 at 04:07 AM UTC
 
-const TRADES_LAST_UPDATED = "July 11, 2026 at 07:41 PM UTC";
+const TRADES_LAST_UPDATED = "July 12, 2026 at 04:07 AM UTC";
 
 const TRADES_HISTORY = [
   { hash: "0x402241789bf0f32658c78af382bd87e951c6e5902a85f8d1eae3485a4ad8fe1f", ts: 1783793567, type: "transfer", inx: 380579 },
@@ -11908,7 +11908,6 @@ const TRADES_HISTORY = [
   { hash: "0xd436c7717f47eab45152cab9096cfd3328c0f9d28c9d5eb3e46acc2030a61f89", ts: 1777896179, type: "buy", inx: 100548 },
   { hash: "0x151c6ed1559c3fe90905f7001953080b52c899f6d020ba972e0b117513c369a1", ts: 1777896167, type: "buy", inx: 100548 },
   { hash: "0x356a0e83c93a8e9787adaabd7b1806fc4854742da0c6c8c08a0ea199c6890af6", ts: 1777896167, type: "buy", inx: 100548 },
-  { hash: "0x9a4aa43cab6bb82e8b84d8db715471aef527fc430ffff48f6081d13f6388c82d", ts: 1777896167, type: "sell", inx: 143163 },
   { hash: "0x5d7b38e75a79e1f943453b32af6d4aef2451d7860f83bf4ac89582b0b65ce177", ts: 1777894655, type: "sell", inx: 100099 },
   { hash: "0xc0bfbe4b606ea9b17b9a4ec7228cfd23e551fea490e152f6daf128a1ab05df09", ts: 1777894655, type: "sell", inx: 100099 },
   { hash: "0xd8840cc383c818034b6a8af087479981c5a8bc7e9dafb7f7d21ada910e70fd28", ts: 1777894655, type: "sell", inx: 100099 },
@@ -28197,7 +28196,6 @@ const TRADES_HISTORY = [
   { hash: "0x83af6e4682dc649af79e39deb2bc862d92daffc7035e3301e8438ac07eaa8993", ts: 1770104027, type: "transfer", inx: 128306 },
   { hash: "0x3b281a7aea710e3fb06af4e6167fbf5df309173970a53c3aa63f7df7eaba47bc", ts: 1770103583, type: "transfer", inx: 113973 },
   { hash: "0x395337ab0949bcc1889da849194dc64c635d193b0f15be4008d2c3ddce00c202", ts: 1770103547, type: "transfer", inx: 104213 },
-  { hash: "0x2ec45c1c787fb1220f032d84062007469ff699051aa20e3afda6f947afe59036", ts: 1770103511, type: "sell", inx: 104213 },
   { hash: "0xb2ceec9165b7a95e316cefc47829a1eac13c18381aa4a9b3429caf46faf62f0b", ts: 1770103391, type: "transfer", inx: 128563 },
   { hash: "0x36de971f6a16eed513dea1d295942fd7199b997d956c4e0c7df46671ea85cbe6", ts: 1770103379, type: "buy", inx: 128563 },
   { hash: "0xd2c9739ea65acc9ed2a0181b5227c9193d33cb8684307ad9a7a2d836a832806f", ts: 1770103331, type: "buy", inx: 159127 },
@@ -31090,10 +31088,10 @@ const TRADES_HISTORY = [
   { hash: "0xaa68c53429836bb383dbfb13bee62a3cd9d313d698868b6ec6b9ad0396d10ce3", ts: 1769800175, type: "transfer", inx: 100010 },
   { hash: "0x960e0bae6935d74a178d5d4cdc22f56c1a3820af7fab1ba11fd42fc1e7c6b1f7", ts: 1769800175, type: "transfer", inx: 920500 },
   { hash: "0xdbe3eed282598439e6833b44ce155a7a25d63af32b1269324803c9d539e8460c", ts: 1769800139, type: "sell", inx: 142416 },
-  { hash: "0x527dbff9887ca345ee5466261e1fafb01f9ff4725b66f6095d73d0d7cbbc8039", ts: 1769800139, type: "transfer", inx: 102000 },
   { hash: "0x46741bcd08118631e24a672bb1e8facf6170a6494871d38254cbff6565b702ce", ts: 1769800115, type: "transfer", inx: 212500 },
   { hash: "0xda1c10cbf0fb65d44d4e86d85eee902c9fa12688fa5d0e3e78a262e819eee424", ts: 1769800115, type: "buy", inx: 108888 },
   { hash: "0x3f2f998ad8e25b5dfe7518a4e3dfe5f087402071409cc4aae137ae7914a93552", ts: 1769800103, type: "transfer", inx: 152500 },
+  { hash: "0x234dc39c0c12b36691ac7b0a8e447f54eb60f544ecd8f77d3bad1f43ee46f77d", ts: 1769800103, type: "sell", inx: 322712 },
   { hash: "0xc96f13fb56807cba89656f6948a53e290c567fcd6745dbcc02f33c60f8f02f36", ts: 1769800079, type: "transfer", inx: 3055400 },
   { hash: "0x51e9bacf2dccca4968d40a72f4e584e12d3754bb1a9d573ce26b7992477874ac", ts: 1769800067, type: "sell", inx: 215462 },
   { hash: "0x60b4f63b9a772c11d0e25385a86d7511c55b160bc779a9246372e9bfd7cf763d", ts: 1769800067, type: "transfer", inx: 100000 },
