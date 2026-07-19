@@ -1,10 +1,12 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: July 18, 2026 at 07:41 PM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: July 19, 2026 at 04:03 AM UTC
 
-const TRADES_LAST_UPDATED = "July 18, 2026 at 07:41 PM UTC";
+const TRADES_LAST_UPDATED = "July 19, 2026 at 04:03 AM UTC";
 
 const TRADES_HISTORY = [
+  { hash: "0x15bd0099d3dfe506e93d9affc1774d74e0a826ffae9880e72c8343e1452d502d", ts: 1784421587, type: "transfer", inx: 203409 },
+  { hash: "0x475bebd3d0569c6b8484ebdf03e319f91ba6e62b3f262bef2dd746b666496f6e", ts: 1784421275, type: "transfer", inx: 203409 },
   { hash: "0x984d7ae13d23fc943696d0a6850d4a7bdc33b20f66181a579d0641d81ed56db6", ts: 1784394791, type: "transfer", inx: 377165 },
   { hash: "0x25461edd93827a655af319d31497f7d4db6e34f658aab9273a8ba9c2c4a9a47d", ts: 1784388839, type: "transfer", inx: 105843 },
   { hash: "0x9572e461d59d0b3d4bc0ce65dbbb6070802497acfaa960d28c8c63cbdb7c3b1d", ts: 1784370323, type: "transfer", inx: 100000 },
@@ -42,7 +44,5 @@ const TRADES_HISTORY = [
   { hash: "0x32471b17688e1916f3cf8597c7cf0fd322d2ef3b1189ab2767bb4320ac3ddffa", ts: 1783907507, type: "transfer", inx: 142055 },
   { hash: "0xd5e5c34120218a386b31ac10f2bc3e2690d02f821f7cfcdabb4915f356aae5ba", ts: 1783893719, type: "transfer", inx: 356557 },
   { hash: "0x811badea4e22d736999269d65cd05e49dd2735fad0b7db8835e0a0bad3722a25", ts: 1783887071, type: "transfer", inx: 475270 },
-  { hash: "0x8f54c598e45981a4583aa0ef632699da6a2fd93e3e1ce30d780fa4679dc5c2b7", ts: 1783838915, type: "transfer", inx: 162740 },
-  { hash: "0x402241789bf0f32658c78af382bd87e951c6e5902a85f8d1eae3485a4ad8fe1f", ts: 1783793567, type: "transfer", inx: 380579 },
-  { hash: "0xe28f11f7503e2c9568102a3a11b3980298edad5e9d9d1c06038b34ad9793e5c3", ts: 1783793075, type: "transfer", inx: 380579 }
+  { hash: "0x8f54c598e45981a4583aa0ef632699da6a2fd93e3e1ce30d780fa4679dc5c2b7", ts: 1783838915, type: "transfer", inx: 162740 }
 ];
