@@ -1,10 +1,19 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: July 27, 2026 at 03:23 PM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: July 27, 2026 at 08:03 PM UTC
 
-const TRADES_LAST_UPDATED = "July 27, 2026 at 03:23 PM UTC";
+const TRADES_LAST_UPDATED = "July 27, 2026 at 08:03 PM UTC";
 
 const TRADES_HISTORY = [
+  { hash: "0xbb1584b80653699aa7091a1959287ad81d85577c4b84bf8dc7b47afe878821b2", ts: 1785177287, type: "transfer", inx: 553443 },
+  { hash: "0xef4ff5c791e9efb8d8491f277e4000c0436ad8184e5e3778b2d9f1de70aff069", ts: 1785176831, type: "transfer", inx: 553443 },
+  { hash: "0xdda000ba948f075e6a2ea727b221674938cffe34b39566ab66dee306436088b0", ts: 1785176639, type: "transfer", inx: 540279 },
+  { hash: "0xae5757b3883bd01f9e1232810410d93499cbb7972d6e2c5fd91368d673b4811f", ts: 1785176567, type: "transfer", inx: 540279 },
+  { hash: "0x1eaf3dbbac7db2411dbe376ab7972c89971c1998908cb34f74f221b56c78e9b7", ts: 1785176471, type: "transfer", inx: 541096 },
+  { hash: "0xc37224a68fc310946b380898d6ed1f7d92cf40e4480c0de63704dc18440e753a", ts: 1785176387, type: "transfer", inx: 541096 },
+  { hash: "0xc360ad65ccda64853da2607a8700dfdf72dac4342fd6088c0e1e28f091ab1a00", ts: 1785168755, type: "transfer", inx: 127123 },
+  { hash: "0x1da206024fd3d1e8e8b0cd2ee345c4be4da8efb253ece83836374a867f2c0cfa", ts: 1785168563, type: "transfer", inx: 127123 },
+  { hash: "0x97cd438a2e7e38fb86ed12159355efc5a0763904fa350a35173f7d3316f92e3d", ts: 1785168503, type: "transfer", inx: 127123 },
   { hash: "0x48401f84b48b81f1da0b9d7472bafc57518bc0664c89179fef7cbe8b55fdcbdb", ts: 1785158759, type: "transfer", inx: 700000 },
   { hash: "0xeb630939b7e4ec1eecec9f867282cc40d039dad556df6651ceb86cd253466518", ts: 1785154415, type: "transfer", inx: 126022 },
   { hash: "0xaf857a30f825b88a74efac65bfaf32b6a308a2446bea36671d034148df44e091", ts: 1785147071, type: "transfer", inx: 110990 },
@@ -36,6 +45,5 @@ const TRADES_HISTORY = [
   { hash: "0x0cf765f0165e5404949c4da63e2d689857df4adca60f33522fd94d426a1f8498", ts: 1784687483, type: "transfer", inx: 110274 },
   { hash: "0xce06741909b3e8a677a22e3680f8da64d98cf8f235f46099449cdb6462eda84a", ts: 1784652275, type: "transfer", inx: 554795 },
   { hash: "0x28a6d4af482b0e818a4529ee6871d522bddfc40a3469ea72585af540d0939ee0", ts: 1784640395, type: "transfer", inx: 100000 },
-  { hash: "0x00c137225e58ef102798fa04c039493f4de8803c2a471871ca09f1255783cd5b", ts: 1784637767, type: "transfer", inx: 258904 },
-  { hash: "0x999a720239a42995e6f95a22b63bfb8fb9fea6f9fea31fef23c9182355db3b5d", ts: 1784617991, type: "transfer", inx: 101334 }
+  { hash: "0x00c137225e58ef102798fa04c039493f4de8803c2a471871ca09f1255783cd5b", ts: 1784637767, type: "transfer", inx: 258904 }
 ];
