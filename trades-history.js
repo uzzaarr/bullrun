@@ -1,10 +1,12 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: July 27, 2026 at 10:25 AM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: July 27, 2026 at 03:23 PM UTC
 
-const TRADES_LAST_UPDATED = "July 27, 2026 at 10:25 AM UTC";
+const TRADES_LAST_UPDATED = "July 27, 2026 at 03:23 PM UTC";
 
 const TRADES_HISTORY = [
+  { hash: "0x48401f84b48b81f1da0b9d7472bafc57518bc0664c89179fef7cbe8b55fdcbdb", ts: 1785158759, type: "transfer", inx: 700000 },
+  { hash: "0xeb630939b7e4ec1eecec9f867282cc40d039dad556df6651ceb86cd253466518", ts: 1785154415, type: "transfer", inx: 126022 },
   { hash: "0xaf857a30f825b88a74efac65bfaf32b6a308a2446bea36671d034148df44e091", ts: 1785147071, type: "transfer", inx: 110990 },
   { hash: "0xfa88791d34763ead87a3d22411c58998bffc6b71704d1b6f29661f9377617584", ts: 1785145619, type: "transfer", inx: 905687 },
   { hash: "0xf727233e991a70a0e88c6aa2bbf503d8d2112507b8815b65f2cd7201b3e4704f", ts: 1785144647, type: "transfer", inx: 905687 },
@@ -35,7 +37,5 @@ const TRADES_HISTORY = [
   { hash: "0xce06741909b3e8a677a22e3680f8da64d98cf8f235f46099449cdb6462eda84a", ts: 1784652275, type: "transfer", inx: 554795 },
   { hash: "0x28a6d4af482b0e818a4529ee6871d522bddfc40a3469ea72585af540d0939ee0", ts: 1784640395, type: "transfer", inx: 100000 },
   { hash: "0x00c137225e58ef102798fa04c039493f4de8803c2a471871ca09f1255783cd5b", ts: 1784637767, type: "transfer", inx: 258904 },
-  { hash: "0x999a720239a42995e6f95a22b63bfb8fb9fea6f9fea31fef23c9182355db3b5d", ts: 1784617991, type: "transfer", inx: 101334 },
-  { hash: "0xbc887d3e6b1a523ec62c726012ef2a7c9066048c19e0846814a819ed9b87af5d", ts: 1784617307, type: "transfer", inx: 107534 },
-  { hash: "0x5ed790834e8e71c0d03bc1c6eeebf69f8639cfb08ca66ba8002b2471f968c60c", ts: 1784616971, type: "transfer", inx: 147837 }
+  { hash: "0x999a720239a42995e6f95a22b63bfb8fb9fea6f9fea31fef23c9182355db3b5d", ts: 1784617991, type: "transfer", inx: 101334 }
 ];
