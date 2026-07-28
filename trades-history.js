@@ -1,10 +1,11 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: July 27, 2026 at 08:03 PM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: July 28, 2026 at 03:46 AM UTC
 
-const TRADES_LAST_UPDATED = "July 27, 2026 at 08:03 PM UTC";
+const TRADES_LAST_UPDATED = "July 28, 2026 at 03:46 AM UTC";
 
 const TRADES_HISTORY = [
+  { hash: "0x6b604d5336e73323ae7d077b8c1d19aa16fcf1cd568a677ebd020ed51a7f3d40", ts: 1785196487, type: "transfer", inx: 488889 },
   { hash: "0xbb1584b80653699aa7091a1959287ad81d85577c4b84bf8dc7b47afe878821b2", ts: 1785177287, type: "transfer", inx: 553443 },
   { hash: "0xef4ff5c791e9efb8d8491f277e4000c0436ad8184e5e3778b2d9f1de70aff069", ts: 1785176831, type: "transfer", inx: 553443 },
   { hash: "0xdda000ba948f075e6a2ea727b221674938cffe34b39566ab66dee306436088b0", ts: 1785176639, type: "transfer", inx: 540279 },
@@ -42,8 +43,5 @@ const TRADES_HISTORY = [
   { hash: "0xdf85f48dd898b76d68086a5f3525490daa99074ec5e1d4dbdf25b3e52e16f04e", ts: 1784712059, type: "transfer", inx: 308082 },
   { hash: "0x308a231c9aa76fb44edca743fff7b914e58718c88272033074346ea2bd3f561c", ts: 1784699735, type: "transfer", inx: 6849315 },
   { hash: "0xd3d3ea58877ab735858e9a6465f34e550138efaadda85bdc1d7a2f70a77b077b", ts: 1784698679, type: "transfer", inx: 179828 },
-  { hash: "0x0cf765f0165e5404949c4da63e2d689857df4adca60f33522fd94d426a1f8498", ts: 1784687483, type: "transfer", inx: 110274 },
-  { hash: "0xce06741909b3e8a677a22e3680f8da64d98cf8f235f46099449cdb6462eda84a", ts: 1784652275, type: "transfer", inx: 554795 },
-  { hash: "0x28a6d4af482b0e818a4529ee6871d522bddfc40a3469ea72585af540d0939ee0", ts: 1784640395, type: "transfer", inx: 100000 },
-  { hash: "0x00c137225e58ef102798fa04c039493f4de8803c2a471871ca09f1255783cd5b", ts: 1784637767, type: "transfer", inx: 258904 }
+  { hash: "0x0cf765f0165e5404949c4da63e2d689857df4adca60f33522fd94d426a1f8498", ts: 1784687483, type: "transfer", inx: 110274 }
 ];
