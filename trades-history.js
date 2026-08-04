@@ -1,8 +1,8 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: August 4, 2026 at 03:47 AM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: August 4, 2026 at 09:19 AM UTC
 
-const TRADES_LAST_UPDATED = "August 4, 2026 at 03:47 AM UTC";
+const TRADES_LAST_UPDATED = "August 4, 2026 at 09:19 AM UTC";
 
 const TRADES_HISTORY = [
   { hash: "0xebe3eeea0973d5f95d3df01015a856be4f7898b6742eba46e711019ed1f9b2e5", ts: 1785802115, type: "transfer", inx: 1126037 },
@@ -55,35 +55,5 @@ const TRADES_HISTORY = [
   { hash: "0x09493cf1b6d172f4d3b107b6ee5a8431b6a4307ccad92967a160f5edda667759", ts: 1785515279, type: "transfer", inx: 100000 },
   { hash: "0x43d793eaf30cfe07efd9faa81eea7aad982add0a6e108c6d74ab2cd3453f643f", ts: 1785511907, type: "transfer", inx: 100000 },
   { hash: "0x81773a10ad73f755ac19817cebea3367b80d3ca308f8d230d4cc8dde3510f72c", ts: 1785508607, type: "transfer", inx: 108493 },
-  { hash: "0x4ee40dbfd853a9eb3b2672944afcf7a00d40091d5c85ba33376368d5b460cde5", ts: 1785505871, type: "transfer", inx: 1698630 },
-  { hash: "0x35dd76a0657e8b1fffac779e5751dd01bc64230f7828721cd6d509147fabf637", ts: 1785504923, type: "transfer", inx: 129315 },
-  { hash: "0xc7f8c262af3a2955a509671d911eb73d6b0ef80b5aaf45d3276b9925af79b535", ts: 1785504791, type: "transfer", inx: 122053 },
-  { hash: "0x3c48cc3c62472c8a54bd28a82517a5c25a2756f92942d47a25c91fa568ec16ac", ts: 1785504635, type: "transfer", inx: 150534 },
-  { hash: "0x410a3dbf9fd88fbcc15883a03169ff90ad4a88aed209d428128b8f8a87abd6fc", ts: 1785504611, type: "transfer", inx: 151327 },
-  { hash: "0xce0e5dffbbe2d94ebcda77d4b52890d6bd96739f3657a129b15127cde8e602e5", ts: 1785504563, type: "transfer", inx: 156164 },
-  { hash: "0x4890486c53fe8d03735ee7db4042cf55442357414dd42a3d99a040ccaea36014", ts: 1785503519, type: "transfer", inx: 1698630 },
-  { hash: "0x9ec828dd87abf45180560b6c3900ed487553419f83e610ee16ee968995b30e69", ts: 1785501119, type: "transfer", inx: 179775 },
-  { hash: "0x186d0bf495dc797339e6df206c3a45c367fb01c657d4a8d2f2ee7e2e3381738d", ts: 1785501119, type: "transfer", inx: 199476 },
-  { hash: "0xdbcf8bed6576cb9a0c0ddca93d03c84014d34b854b669f25ac83a86b3732e015", ts: 1785501107, type: "transfer", inx: 200000 },
-  { hash: "0xa67d43ae01e16fbe8696d31b6641b71d8edd2f0ce8ba37e7056f774b656b6576", ts: 1785501083, type: "transfer", inx: 183675 },
-  { hash: "0x01a4d9207e5289882961193ab274a65bdae9dac9d2dd30f36374354ed59e09cc", ts: 1785500927, type: "transfer", inx: 216971 },
-  { hash: "0xbaea4db93923326c08b6976962b1d99fcabc6abf415ff0947fc22a11e07b97c4", ts: 1785500915, type: "transfer", inx: 220937 },
-  { hash: "0xefa623ada548f1a6c77a37462d273549bc467a26b93c0ae75d5323184e6f429f", ts: 1785500243, type: "transfer", inx: 1117742 },
-  { hash: "0xe002172c71a20945191785691632a4ee51fd318c8d5b2fb73f2042c3310917ff", ts: 1785499967, type: "transfer", inx: 214405 },
-  { hash: "0x0f8b2afcfac0a5ae501329fa08b9b938b183e71ddaccbca680fdbd8a2e37e62d", ts: 1785498467, type: "transfer", inx: 300000 },
-  { hash: "0x5af07a7a999194fc5e1d2cec33fd65018115d9e2afcdc8a99b6eb94a9a4c418c", ts: 1785498335, type: "transfer", inx: 523230 },
-  { hash: "0xaa7b025cfcb19ed8ae56ef4ef9ee75deec9d404da2ba81ec5d0c453c1d136cbe", ts: 1785498335, type: "transfer", inx: 761960 },
-  { hash: "0x93daaa3f7eb9a7abfdb999024cd15db6a3845f481b7dbdf7c914dde97a483498", ts: 1785498275, type: "transfer", inx: 252643 },
-  { hash: "0xc307f26f27a16ef2525089bf210399dcdade64fc89f2a2704c4f09869c110865", ts: 1785498227, type: "transfer", inx: 715554 },
-  { hash: "0x64046ed1d16af4885a8421bce6f813dbe65d91fc7216d14b24d0eeff0c89fd42", ts: 1785498131, type: "transfer", inx: 177397 },
-  { hash: "0xedee210e50bc6968c5f3a23fd8ee996d36a7e4ebf55cad78d3e7ca7b01030ed0", ts: 1785498047, type: "transfer", inx: 1036507 },
-  { hash: "0x697556becd0237195fcaa38817c749fb675ff066ed3e789c7157c891f091f5bd", ts: 1785497951, type: "transfer", inx: 426515 },
-  { hash: "0xaca97cfc6d5eed77b22aba7d8437f9e82843e912c46ad8e24fd628b689938905", ts: 1785497927, type: "transfer", inx: 566775 },
-  { hash: "0xb2a45b5d5650e02cfe30f9c3f63972e1e829fdaf5e2f734d39afeeee3a9719f6", ts: 1785497867, type: "transfer", inx: 656114 },
-  { hash: "0x382f14e1981c23c14b70d25fd7b5cc31dcbb4da1b4114b5a810ea82222bdf2c2", ts: 1785497351, type: "transfer", inx: 225495 },
-  { hash: "0x0289e1cff6ce39e4ff0dfbdc1b2351aeac4b81185632e9742796b98f27b3c46a", ts: 1785497339, type: "transfer", inx: 319588 },
-  { hash: "0xa0f72bc5df0999affe6f2251cbffec6a54ea9db3456ba923b828b3ad90c5f392", ts: 1785497327, type: "transfer", inx: 312329 },
-  { hash: "0x85ba8c20daf17a34507fe843ea50548b9b8abe67fb3663cb506e2a9824a084a5", ts: 1785496439, type: "transfer", inx: 289848 },
-  { hash: "0xb9ca5b8a0a6aca5e88654cc737c66d718528efaaebd68b4bd606ed304cee3781", ts: 1785496307, type: "transfer", inx: 189315 },
-  { hash: "0x94e38af56c5db6b17df01f9c2f06678661261ce470b88d1baf20a6557c72ea7c", ts: 1785496259, type: "transfer", inx: 324426 }
+  { hash: "0x4ee40dbfd853a9eb3b2672944afcf7a00d40091d5c85ba33376368d5b460cde5", ts: 1785505871, type: "transfer", inx: 1698630 }
 ];
