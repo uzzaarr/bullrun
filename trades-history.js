@@ -1,8 +1,8 @@
 // INX Whale Swap History
 // Source: Etherscan V2 — whale DEX swaps (≥100K INX) since TGE (Jan 30 2026)
-// Auto-refreshed every 6h via GitHub Actions | Updated: August 4, 2026 at 03:00 PM UTC
+// Auto-refreshed every 6h via GitHub Actions | Updated: August 4, 2026 at 08:08 PM UTC
 
-const TRADES_LAST_UPDATED = "August 4, 2026 at 03:00 PM UTC";
+const TRADES_LAST_UPDATED = "August 4, 2026 at 08:08 PM UTC";
 
 const TRADES_HISTORY = [
   { hash: "0xebe3eeea0973d5f95d3df01015a856be4f7898b6742eba46e711019ed1f9b2e5", ts: 1785802115, type: "transfer", inx: 1126037 },
@@ -45,10 +45,5 @@ const TRADES_HISTORY = [
   { hash: "0x6af29051c3400cd569c21f67a3efa52b1ee9e25f1b3be8fdb11d330c3718eb88", ts: 1785548639, type: "transfer", inx: 2232603 },
   { hash: "0x099f27fdf78060dc9eb562574cbecdc5344dbebdeda9b43e92343728a834d70a", ts: 1785547811, type: "transfer", inx: 157534 },
   { hash: "0xaba1143d621cea236248289bcfcd427699d3d3ac9508ff5ce79af856daf78209", ts: 1785544331, type: "transfer", inx: 100000 },
-  { hash: "0x81137f698435b8cfbb9e44c30226500a1bb747b27cf82ff2ffb56d04a157ce6d", ts: 1785535631, type: "transfer", inx: 127123 },
-  { hash: "0x65e4bdb4956c5b16a21adf6a903571e913031b683d59063de68d04fd8e6d6617", ts: 1785525023, type: "transfer", inx: 263601 },
-  { hash: "0xde406028a6851142e9a6ad2dbcb2d57522c7f627569f86d926a5b6fe865343c5", ts: 1785524423, type: "transfer", inx: 263601 },
-  { hash: "0x6c6ac5204257e116deff8f683d22c604170a56f841f364b27556967ff11a313c", ts: 1785524243, type: "transfer", inx: 266716 },
-  { hash: "0x6cc6f89a246bd30a3e09fbb1e4654d8e8ff8cf6f05c5a58645d21667670827a0", ts: 1785524171, type: "transfer", inx: 266716 },
-  { hash: "0x2bd65e8f53fc3fe9a0e1e2def6248e43cd214e0b909d8a78f37c509825177622", ts: 1785524135, type: "transfer", inx: 267123 }
+  { hash: "0x81137f698435b8cfbb9e44c30226500a1bb747b27cf82ff2ffb56d04a157ce6d", ts: 1785535631, type: "transfer", inx: 127123 }
 ];
