@@ -2,13 +2,15 @@
 // Source: Etherscan V2 — Auto-refreshed every 6h via GitHub Actions
 // Whale threshold: 100,000 INX | Last 24h window
 
-const WHALE_LAST_UPDATED      = "September 16, 2026 at 08:45 PM UTC";
+const WHALE_LAST_UPDATED      = "September 17, 2026 at 02:54 AM UTC";
 const WHALE_THRESHOLD         = 100000;
-const WHALE_TRANSFERS_SCANNED = 339;
-const WHALE_TOTAL_VOLUME      = 17430073;
+const WHALE_TRANSFERS_SCANNED = 292;
+const WHALE_TOTAL_VOLUME      = 12106745;
 const WHALE_BIGGEST_SINGLE    = 1534247;
 
 const WHALE_TRANSFERS = [
+    { hash: "0xf903e95b900231a7d5088920c55026b176e5533c807b12094c5424c2fcf076b1", ts: 1789606463, from: "0x5618ec2a0accfe92ea6c2b77676dee7342225797", to: "0x000000000004444c5dc75cb358380d2e3de08a90", amount: 100000, block: 25993753, type: "sell" },
+    { hash: "0x7417c33e5d03a4f03aee361da5d83f9fb416a2e942096db102f4efb3a8d05ac1", ts: 1789596179, from: "0x5618ec2a0accfe92ea6c2b77676dee7342225797", to: "0x000000000004444c5dc75cb358380d2e3de08a90", amount: 100000, block: 25992898, type: "sell" },
     { hash: "0xa51bedd2dc3794c8adff3428a747ce256b062d9de5822eb5dd177125590efe78", ts: 1789589171, from: "0x000000000004444c5dc75cb358380d2e3de08a90", to: "0x5618ec2a0accfe92ea6c2b77676dee7342225797", amount: 100000, block: 25992316, type: "buy" },
     { hash: "0x023dfdf9a38e1bffabb79c60bec43aacd6a6aef502f103ac3f6e92a8c6b399cb", ts: 1789588163, from: "0x000000000004444c5dc75cb358380d2e3de08a90", to: "0x5618ec2a0accfe92ea6c2b77676dee7342225797", amount: 100000, block: 25992232, type: "buy" },
     { hash: "0xe0a6d5c9fcd317fec75fb457d0a3583a4b58e424032d432a30c24785163248b5", ts: 1789586747, from: "0x5618ec2a0accfe92ea6c2b77676dee7342225797", to: "0x000000000004444c5dc75cb358380d2e3de08a90", amount: 100000, block: 25992114, type: "sell" },
@@ -43,18 +45,7 @@ const WHALE_TRANSFERS = [
     { hash: "0x865aa2cad8ffb16f77041501428be426acd7cd763b70162650dd039de49e0d13", ts: 1789556975, from: "0x348d8aec610e03b644ea8e99bad87f674a24f3f2", to: "0x9199ba7d5922ea8cb30e90dbee618e317b25dabc", amount: 145019, block: 25989644, type: "transfer" },
     { hash: "0xe85dbbb98b7702894e6c4546227d717b7c1d75f523d1a57030d084885c430505", ts: 1789552103, from: "0x000000000004444c5dc75cb358380d2e3de08a90", to: "0x95ef63fe9acc3e0bd5a44f4cd878ba730d93365f", amount: 172283, block: 25989240, type: "buy" },
     { hash: "0xf7ee2fc28f1002e54915e9e6d5a04c98ae86055954c5f328ff431f7db11dc8a7", ts: 1789539539, from: "0x8ca0a5d199f81775fc19da348828f2dc872eab44", to: "0x000000000004444c5dc75cb358380d2e3de08a90", amount: 171757, block: 25988198, type: "sell" },
-    { hash: "0x0e77afa47d9b23ca9cf6bf4bf6ea80b9d04be3f9362d069ca39a0086d5c815a3", ts: 1789538075, from: "0x000000000004444c5dc75cb358380d2e3de08a90", to: "0x8ca0a5d199f81775fc19da348828f2dc872eab44", amount: 172318, block: 25988076, type: "buy" },
-    { hash: "0x796350ec8e71dab9634e4d3709fa42b7291e3a25bf7ca35e1c133f76f8fe4cf3", ts: 1789526315, from: "0x0d0707963952f2fba59dd06f2b425ace40b492fe", to: "0x09fc9b7545020f6a51d113e495e0a451597969d3", amount: 1152946, block: 25987098, type: "transfer" },
-    { hash: "0xe2a3dba9b0b81e3bf928fef110ff351b926ae74eb02d72b277b576aa1c1dbd70", ts: 1789523627, from: "0x67336cec42645f55059eff241cb02ea5cc52ff86", to: "0x000000000004444c5dc75cb358380d2e3de08a90", amount: 159632, block: 25986874, type: "sell" },
-    { hash: "0xc81123705d49efb46e11d3b1030247273c76c0454e52c07a056fb25683ad1418", ts: 1789522967, from: "0x67336cec42645f55059eff241cb02ea5cc52ff86", to: "0x000000000004444c5dc75cb358380d2e3de08a90", amount: 163720, block: 25986819, type: "sell" },
-    { hash: "0x554eae2565ca08ad3a6b6406d74389d7e575a6b91f627afcf7438aa33a8bf0c3", ts: 1789522955, from: "0xe06cdd36c3fb35f6ffb5933369595770da829419", to: "0x000000000004444c5dc75cb358380d2e3de08a90", amount: 107311, block: 25986818, type: "sell" },
-    { hash: "0x554eae2565ca08ad3a6b6406d74389d7e575a6b91f627afcf7438aa33a8bf0c3", ts: 1789522955, from: "0xbdb3ba9ffe392549e1f8658dd2630c141fdf47b6", to: "0xe06cdd36c3fb35f6ffb5933369595770da829419", amount: 107311, block: 25986818, type: "transfer" },
-    { hash: "0x0e3aee960194e09332cfcc10f2bed0bdc8076aa9b393f22662ba7a42bfe8af36", ts: 1789520711, from: "0x5618ec2a0accfe92ea6c2b77676dee7342225797", to: "0x000000000004444c5dc75cb358380d2e3de08a90", amount: 100000, block: 25986632, type: "sell" },
-    { hash: "0x7cf93cf3757d1494ced9ff85737f7ef0a611dc2b04910688b7b9a33d4f60386d", ts: 1789520687, from: "0x5618ec2a0accfe92ea6c2b77676dee7342225797", to: "0x000000000004444c5dc75cb358380d2e3de08a90", amount: 100000, block: 25986630, type: "sell" },
-    { hash: "0xb17f0dc5f41fa238af0127979511e7f05bb40fff4df22c8c2227fd8019e423e5", ts: 1789520639, from: "0x0dcfbef3099ee33265f8dd7f21ac7f72db9dc995", to: "0x000000000004444c5dc75cb358380d2e3de08a90", amount: 165824, block: 25986626, type: "sell" },
-    { hash: "0x634fe274d9168ed05a7a1791293ff982b42c5eca4830e60c9d1d5ba963641de4", ts: 1789518335, from: "0x33ba873aa26b9c44c311e44bfd502dc7ad9cda8a", to: "0x0d0707963952f2fba59dd06f2b425ace40b492fe", amount: 1155528, block: 25986434, type: "transfer" },
-    { hash: "0x97a083349c385eb9466760afafd3ed4a9415c6f34b7baf4138be79c3f63ca8c8", ts: 1789513787, from: "0xac9da6761ef80644a3bb9ab7e590cf4e64be084f", to: "0x33ba873aa26b9c44c311e44bfd502dc7ad9cda8a", amount: 1155528, block: 25986055, type: "transfer" },
-    { hash: "0xb02d71af23358093bb91d2e25af23280d5e13108e49e09ce56e2dda53e6617c7", ts: 1789513607, from: "0x09fc9b7545020f6a51d113e495e0a451597969d3", to: "0xac9da6761ef80644a3bb9ab7e590cf4e64be084f", amount: 1155528, block: 25986040, type: "transfer" }
+    { hash: "0x0e77afa47d9b23ca9cf6bf4bf6ea80b9d04be3f9362d069ca39a0086d5c815a3", ts: 1789538075, from: "0x000000000004444c5dc75cb358380d2e3de08a90", to: "0x8ca0a5d199f81775fc19da348828f2dc872eab44", amount: 172318, block: 25988076, type: "buy" }
 ];
 
 const WHALE_ACCUMULATORS = [
@@ -62,52 +53,52 @@ const WHALE_ACCUMULATORS = [
     { wallet: "0x8b2559cee51642d0b19ec4cf01f400b0c973e9de", net: 1242740, received: 1242740, sent: 0, txs: 1 },
     { wallet: "0xab782bc7d4a2b306825de5a7730034f8f63ee1bc", net: 607652, received: 660304, sent: 52652, txs: 3 },
     { wallet: "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43", net: 488756, received: 541330, sent: 52574, txs: 3 },
+    { wallet: "0x67336cec42645f55059eff241cb02ea5cc52ff86", net: 185083, received: 609493, sent: 424411, txs: 9 },
     { wallet: "0x9199ba7d5922ea8cb30e90dbee618e317b25dabc", net: 145019, received: 145019, sent: 0, txs: 1 },
-    { wallet: "0x672eb34b88d9e49034eabef5497566626d56f48c", net: 67200, received: 67200, sent: 0, txs: 1 },
-    { wallet: "0x0faeb60e1b406c2f84454f169a2512a5792e1aa8", net: 46862, received: 46862, sent: 0, txs: 1 },
+    { wallet: "0xbe4ae6e24d12dbd180517f126765178bae81f341", net: 78904, received: 78904, sent: 0, txs: 1 },
     { wallet: "0xe8446569ee2311ac5c455cf97e6eb5cd594356ea", net: 21918, received: 21918, sent: 0, txs: 1 },
     { wallet: "0x4792c3cea478c855376cfadc311da2e5893d5558", net: 19452, received: 19452, sent: 0, txs: 1 },
-    { wallet: "0x76abb3498f4a079942efcd96791d5a61267be0d1", net: 13973, received: 13973, sent: 0, txs: 1 },
+    { wallet: "0xbdb3ba9ffe392549e1f8658dd2630c141fdf47b6", net: 15739, received: 428630, sent: 412891, txs: 15 },
     { wallet: "0xc64f63f50eee4122cfb595009977856899faffc4", net: 11781, received: 11781, sent: 0, txs: 1 },
     { wallet: "0xd2dd7b597fd2435b6db61ddf48544fd931e6869f", net: 11474, received: 11474, sent: 0, txs: 1 },
     { wallet: "0x5bfdb327168803a1b33c6062ef28ac0e3fe88e31", net: 8573, received: 8573, sent: 0, txs: 1 },
     { wallet: "0x9019ee8d4fe33c501872e4ff106da3b89cc89db7", net: 6027, received: 6027, sent: 0, txs: 1 },
     { wallet: "0xf631bebca82f2998c7ed085675a43a48c4bbb9fb", net: 4384, received: 4384, sent: 0, txs: 1 },
-    { wallet: "0x2cff890f0378a11913b6129b2e97417a2c302680", net: 2575, received: 2575, sent: 0, txs: 2 },
-    { wallet: "0xdfc90a70d89bece5ac9331fbd680e3306e9afc15", net: 2192, received: 2192, sent: 0, txs: 1 },
-    { wallet: "0x50e8e34147929096ab69b3316ac0f1adf8b684c1", net: 2055, received: 2055, sent: 0, txs: 1 },
     { wallet: "0x295fc34f1742c4e8bd1bfeb3711be567919fa72d", net: 1821, received: 347106, sent: 345285, txs: 4 },
-    { wallet: "0x3a55839309baa2ac853f8a8578eba44dfe3d6203", net: 1535, received: 1535, sent: 0, txs: 1 },
+    { wallet: "0xde93720d9e834a3f786839bc327746df8c1f3727", net: 1644, received: 1644, sent: 0, txs: 2 },
+    { wallet: "0x2cff890f0378a11913b6129b2e97417a2c302680", net: 1623, received: 1623, sent: 0, txs: 1 },
     { wallet: "0x8e116b4bf95b990b9240e84ad674bd10c0b0759c", net: 1507, received: 1507, sent: 0, txs: 1 },
     { wallet: "0x95ef63fe9acc3e0bd5a44f4cd878ba730d93365f", net: 1488, received: 172283, sent: 170795, txs: 2 },
-    { wallet: "0x2d84a18d4d1356420f3115e4d11e26680671c62d", net: 1370, received: 1370, sent: 0, txs: 1 },
     { wallet: "0xe29bbf09fae143386e1beb340be522a84526d0f6", net: 822, received: 822, sent: 0, txs: 1 },
-    { wallet: "0xde93720d9e834a3f786839bc327746df8c1f3727", net: 822, received: 822, sent: 0, txs: 1 },
     { wallet: "0xf208a16191afc75d6de112568cdc86b30dfbdabf", net: 548, received: 548, sent: 0, txs: 1 },
-    { wallet: "0xd32c062c12c2d10bec0187dd334cc15e0367f9ac", net: 278, received: 278, sent: 0, txs: 8 },
-    { wallet: "0xd4ecca8f08ac6fadaed2cb141637c95ee4c74d43", net: 137, received: 137, sent: 0, txs: 1 },
+    { wallet: "0xd32c062c12c2d10bec0187dd334cc15e0367f9ac", net: 398, received: 398, sent: 0, txs: 10 },
+    { wallet: "0xb57ff6e684ff7f7732f4e4d21069e90d567c0f30", net: 137, received: 137, sent: 0, txs: 1 },
     { wallet: "0x1b8574dd35db41fa8bce680bc7fd4f59edf89192", net: 137, received: 137, sent: 0, txs: 1 },
     { wallet: "0xc9b0c04bbffbcbd534fc9a45c3a024fb66389e83", net: 137, received: 137, sent: 0, txs: 1 },
+    { wallet: "0x45fe1ba15449d09cf7ebb8b825f7f1c859824563", net: 73, received: 73, sent: 0, txs: 1 },
+    { wallet: "0x147cf09e7373b8fda6f12021f1b0f98d6da1a566", net: 49, received: 49, sent: 0, txs: 1 },
     { wallet: "0xb1a78eea2125efcf4c9153c551b3ece73e8a3ca7", net: 26, received: 26, sent: 0, txs: 1 },
     { wallet: "0x24ab00824016312c52cd32da7ade2050d9415b73", net: 12, received: 12, sent: 0, txs: 1 },
-    { wallet: "0xc810b569812f82d40debf360239a1ba998dc1c50", net: 11, received: 11, sent: 0, txs: 1 },
+    { wallet: "0xc06ebbefd94032b85424d51906e2a335efae264b", net: 9, received: 9, sent: 0, txs: 1 },
     { wallet: "0x0730f6e24b2e583c3292d0f81f8976bcdb4258b5", net: 3, received: 3, sent: 0, txs: 1 },
     { wallet: "0x0a50d3b2c8517c8a7d46ec82c77ad75eb2d42ba3", net: 2, received: 2, sent: 0, txs: 1 },
-    { wallet: "0x413720641bbd99f16ae217f6329acccadb6701a8", net: 1, received: 4202, sent: 4201, txs: 2 },
     { wallet: "0xca5b3bbb368db39d223a9fa57a577f9a98a03638", net: 1, received: 1, sent: 0, txs: 1 },
+    { wallet: "0x09fc1031d03a78ed4f60463fa9749870d33439bc", net: 0, received: 54247, sent: 54247, txs: 3 },
+    { wallet: "0xca08005f080c57936effa193da94547e95a3439a", net: 0, received: 54247, sent: 54247, txs: 2 },
+    { wallet: "0xb92fe925dc43a0ecde6c8b1a2709c170ec4fff4f", net: 0, received: 40131, sent: 40131, txs: 22 },
+    { wallet: "0xec3543a772b5abd5c5e906745c7686a59c0665ac", net: 0, received: 2055, sent: 2055, txs: 3 },
+    { wallet: "0x50e8e34147929096ab69b3316ac0f1adf8b684c1", net: 0, received: 2055, sent: 2055, txs: 2 },
     { wallet: "0x5618ec2a0accfe92ea6c2b77676dee7342225797", net: 0, received: 600000, sent: 600000, txs: 12 },
+    { wallet: "0xe06cdd36c3fb35f6ffb5933369595770da829419", net: 0, received: 841521, sent: 841521, txs: 30 },
+    { wallet: "0x8257eea3d474ea047ef1aa124f85a4fb1700507b", net: 0, received: 1096, sent: 1096, txs: 3 },
+    { wallet: "0x22ec88b9ff78c6f2458ab1a7aa8bb99d84bd4b86", net: 0, received: 3592, sent: 3592, txs: 2 },
+    { wallet: "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae", net: 0, received: 5443, sent: 5443, txs: 6 },
+    { wallet: "0x89c6340b1a1f4b25d36cd8b063d49045caf3f818", net: 0, received: 5443, sent: 5443, txs: 4 },
     { wallet: "0xcaf0beadeaefc66fef60ac6526ab566d58c8647a", net: 0, received: 1390, sent: 1390, txs: 2 },
     { wallet: "0xd1ce3a7c1671763ad1cb7f90ba9401c68f9b3ed6", net: 0, received: 1390, sent: 1390, txs: 2 },
-    { wallet: "0xe06cdd36c3fb35f6ffb5933369595770da829419", net: 0, received: 998636, sent: 998636, txs: 34 },
-    { wallet: "0xb92fe925dc43a0ecde6c8b1a2709c170ec4fff4f", net: 0, received: 145519, sent: 145519, txs: 28 },
     { wallet: "0xe9235ef454eae6d8fade26c4790fa94071623734", net: 0, received: 1370, sent: 1370, txs: 3 },
     { wallet: "0xdd5eaf1aba9cca3b1daa2cbfacd589ae9329d69a", net: 0, received: 1370, sent: 1370, txs: 2 },
-    { wallet: "0xe947887d246883decd222214c8fef1da864982bf", net: 0, received: 1370, sent: 1370, txs: 2 },
-    { wallet: "0x179c72585b3e121d15d68131dff8b9aa4c285fc4", net: 0, received: 1534247, sent: 1534247, txs: 2 },
-    { wallet: "0xe29a56bb873f6166bcafee7e2287a9acb7710741", net: 0, received: 1534247, sent: 1534247, txs: 2 },
-    { wallet: "0x7ed77c685ab6aae3b2302cc31910122bd2b41616", net: 0, received: 1623, sent: 1623, txs: 2 },
-    { wallet: "0x44926d92979d022991a31ed8ba12580bb9edaac8", net: 0, received: 1644, sent: 1644, txs: 3 },
-    { wallet: "0x747dd095f8b63a66d7c31f41bb22afb698224e36", net: 0, received: 1644, sent: 1644, txs: 2 }
+    { wallet: "0xe947887d246883decd222214c8fef1da864982bf", net: 0, received: 1370, sent: 1370, txs: 2 }
 ];
 
 const WHALE_LABELS = {
